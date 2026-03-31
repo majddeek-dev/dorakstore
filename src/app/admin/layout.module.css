@@ -2,6 +2,15 @@
   display: flex;
   min-height: 100vh;
   background-color: #f4f6f8;
+  color: #111; /* Force default text to be dark in the admin area */
+  color-scheme: light; /* Ensure browser elements like scrollbars and inputs use light mode */
+}
+/* Force all inputs and selects in the admin area to have clear colors */
+.adminContainer input,
+.adminContainer select,
+.adminContainer textarea {
+  color: #111;
+  background-color: #fff;
 }
 
 .burger {
