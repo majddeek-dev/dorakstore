@@ -7,16 +7,24 @@
 .burger {
   display: none;
   position: fixed;
-  top: 1rem;
-  left: 1rem;
-  z-index: 100;
-  background: #111;
-  color: #fff;
-  border: none;
-  padding: 0.7rem 1rem;
-  border-radius: 6px;
+  bottom: 2rem; 
+  right: 1.5rem; 
+  z-index: 1001; 
+  background: #fff;
+  color: #111;
+  border: 2px solid #111;
+  border-radius: 50%; /* Circle */
+  width: 56px;
+  height: 56px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.5rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  transition: transform 0.2s;
+  align-items: center;
+  justify-content: center;
+}
+.burger:active {
+  transform: scale(0.95);
 }
 
 .sidebar {
@@ -90,18 +98,19 @@
   }
   
   .burger {
-    display: block;
+    display: flex; /* Use flex to center the icon inside the circle */
   }
 
   .sidebar {
     position: fixed;
     top: 0;
-    left: 0;
+    right: 0; /* Align sidebar right for Arabic */
     height: 100vh;
-    transform: translateX(-100%);
+    transform: translateX(100%); /* Hide it to the right for RTL */
     visibility: hidden;
-    z-index: 99;
-    width: 240px;
+    z-index: 1005; /* Must be higher than header (1000) and burger (1001) */
+    width: 260px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
   }
 
   .sidebar.open {
