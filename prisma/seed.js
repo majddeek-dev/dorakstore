@@ -1,6 +1,21 @@
+const fs = require('fs');
+const path = require('path');
+const envPath = path.join(__dirname, '../.env');
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf8');
+  const match = envContent.match(/DATABASE_URL="?([^"\n]+)"?/);
+  if (match) process.env.DATABASE_URL = match[1];
+}
+
 const { PrismaClient } = require('@prisma/client')
 const bcrypt = require('bcryptjs')
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
+  }
+})
 
 async function main() {
   // Seed Products
