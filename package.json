@@ -12,6 +12,7 @@
     "@prisma/client": "^6.19.2",
     "@supabase/supabase-js": "^2.101.1",
     "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.8.0",
     "jose": "^6.2.2",
     "jsonwebtoken": "^9.0.3",
     "next": "16.2.1",
