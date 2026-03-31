@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  category    String    // Plain string for now
+  categoryId  String?   // Link to dynamic category
+  categoryRel Category? @relation(fields: [categoryId], references: [id])
+  price       Float
+  costPrice   Float     @default(0)
+  oldPrice    Float?
+  badge       String?
+  desc        String?
+  stock       Int       @default(0)
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  orderItems OrderItem[]
+}
+
+model Order {
+  id            String    @id @default(cuid())
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  customerName  String
+  customerPhone String
+  region        String
+  address       String
+  total         Float
+  status        String    @default("قيد المعالجة")
+  paymentMethod String    @default("COD")
+  createdAt     DateTime  @default(now())
+  
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+  
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  products  Product[]
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  phone        String?
+  createdAt    DateTime @default(now())
+  orders       Order[]
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  description String
+  amount      Float
+  category    String   // e.g., "Marketing", "Shipping", "Hosting"
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
+
+model GlobalSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model Coupon {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  discountPercent Float
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+}

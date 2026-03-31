@@ -1,0 +1,116 @@
+.card {
+  border: 1px solid var(--gray-light);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--background);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(255,255,255,0.05);
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--foreground);
+  color: var(--background);
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.imageWrap {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: var(--gray-light);
+}
+
+.placeholderImage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-medium);
+  font-size: 0.9rem;
+}
+
+.info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.name:hover {
+  text-decoration: underline;
+}
+
+.pricing {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.oldPrice {
+  font-size: 0.9rem;
+  color: var(--gray-medium);
+  text-decoration: line-through;
+}
+
+.addToCart {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--foreground);
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.addToCart:hover {
+  background-color: var(--foreground);
+  color: var(--background);
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.noImg {
+  font-size: 3rem;
+  opacity: 0.3;
+}
