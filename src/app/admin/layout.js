@@ -31,13 +31,15 @@ export default function AdminLayout({ children }) {
       </button>
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.open : ''}`}>
         <div className={styles.logo}>
-          <Link href="/admin">DK7 <span>Admin</span></Link>
+          <Link href="/admin">Dorak <span>Admin</span></Link>
         </div>
         <nav className={styles.nav}>
           <Link href="/admin" className={pathname === '/admin' ? styles.active : ''}>لوحة القيادة</Link>
           <Link href="/admin/orders" className={pathname.startsWith('/admin/orders') ? styles.active : ''}>الطلبات</Link>
           <Link href="/admin/products" className={pathname.startsWith('/admin/products') ? styles.active : ''}>المنتجات</Link>
           <Link href="/admin/customers" className={pathname.startsWith('/admin/customers') ? styles.active : ''}>العملاء</Link>
+          <Link href="/admin/discounts" className={pathname.startsWith('/admin/discounts') ? styles.active : ''}>خصومات</Link>
+          <Link href="/admin/categories" className={pathname.startsWith('/admin/categories') ? styles.active : ''}>الفئات</Link>
           <Link href="/" className={`${styles.storeLink} ${pathname === '/' ? styles.active : ''}`}>العودة للمتجر</Link>
         </nav>
         <button
