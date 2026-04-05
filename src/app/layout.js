@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import { CartProvider } from "@/lib/CartContext";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata = {
   title: "أفضل المنتجات بأسعار منافسة وجودة مضمونة | Dorak Store",
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
           </main>
           <WhatsAppButton />
           <Footer />
+          <SpeedInsights />
         </CartProvider>
       </body>
     </html>

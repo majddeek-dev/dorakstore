@@ -8,30 +8,51 @@ export default function Shop() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
+  // Fetch categories once
   useEffect(() => {
-    async function load() {
+    fetch('/api/categories').then(res => res.json()).then(data => {
+      if(Array.isArray(data)) setCategories(data);
+    });
+  }, []);
+
+  // Fetch products when category or page changes
+  useEffect(() => {
+    async function loadProducts() {
       setLoading(true);
       try {
-        const [pRes, cRes] = await Promise.all([
-          fetch('/api/products'),
-          fetch('/api/categories')
-        ]);
-        const [pData, cData] = await Promise.all([pRes.json(), cRes.json()]);
-        setProducts(Array.isArray(pData) ? pData : []);
-        setCategories(Array.isArray(cData) ? cData : []);
+        const urlOpts = new URLSearchParams();
+        if (activeCategory !== 'all') urlOpts.append('category', activeCategory);
+        urlOpts.append('page', currentPage);
+        urlOpts.append('limit', 10);
+        
+        const res = await fetch(`/api/products?${urlOpts.toString()}`);
+        const data = await res.json();
+        
+        if (data.products) {
+          setProducts(data.products);
+          setTotalPages(data.totalPages);
+        } else if (Array.isArray(data)) {
+          setProducts(data);
+          setTotalPages(1);
+        } else {
+          setProducts([]);
+        }
       } catch (err) {
         console.error("Shop load error", err);
       } finally {
         setLoading(false);
       }
     }
-    load();
-  }, []);
+    loadProducts();
+  }, [activeCategory, currentPage]);
 
-  const filteredProducts = activeCategory === "all" 
-    ? products 
-    : products.filter(p => p.categoryId === activeCategory || p.category === activeCategory);
+  const handleCategoryChange = (catId) => {
+    setActiveCategory(catId);
+    setCurrentPage(1); // Reset to first page when changing category
+  }
 
   return (
     <div className={styles.container}>
@@ -40,7 +61,7 @@ export default function Shop() {
       <div className={styles.filters}>
         <button 
           className={`${styles.filterBtn} ${activeCategory === "all" ? styles.active : ""}`}
-          onClick={() => setActiveCategory("all")}
+          onClick={() => handleCategoryChange("all")}
         >
           الكل
         </button>
@@ -48,7 +69,7 @@ export default function Shop() {
           <button 
             key={cat.id} 
             className={`${styles.filterBtn} ${activeCategory === cat.id ? styles.active : ""}`}
-            onClick={() => setActiveCategory(cat.id)}
+            onClick={() => handleCategoryChange(cat.id)}
           >
             {cat.name}
           </button>
@@ -59,14 +80,38 @@ export default function Shop() {
         <div style={{textAlign: "center", padding: "4rem"}}>جاري تحميل المنتجات...</div>
       ) : (
         <div className={styles.grid}>
-          {filteredProducts.map(p => (
+          {products.map(p => (
             <ProductCard key={p.id} {...p} />
           ))}
         </div>
       )}
       
-      {!loading && filteredProducts.length === 0 && (
+      {!loading && products.length === 0 && (
         <div className={styles.empty}>لا توجد منتجات في هذا القسم حالياً.</div>
+      )}
+
+      {!loading && totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button 
+            disabled={currentPage === 1} 
+            onClick={() => setCurrentPage(prev => prev - 1)}
+            className={styles.pageBtn}
+          >
+            السابق
+          </button>
+          
+          <span className={styles.pageInfo}>
+            صفحة {currentPage} من {totalPages}
+          </span>
+          
+          <button 
+            disabled={currentPage === totalPages} 
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            className={styles.pageBtn}
+          >
+            التالي
+          </button>
+        </div>
       )}
     </div>
   );

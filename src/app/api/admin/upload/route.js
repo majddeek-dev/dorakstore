@@ -7,6 +7,12 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 
+if (supabase) {
+  console.log("Supabase Client Initialized with URL:", supabaseUrl);
+} else {
+  console.error("Supabase Client Failed to Initialize - Check your .env file!");
+}
+
 export async function POST(request) {
   try {
     const formData = await request.formData();
@@ -22,17 +28,15 @@ export async function POST(request) {
       }, { status: 500 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Create unique filename
-    const filename = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
+    // Create unique, safe filename (remove arabic/special chars to prevent S3 issues)
+    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const filename = `${Date.now()}-${safeName}`;
 
     // Upload to Supabase Storage
     // NOTE: Ensure you have a bucket named 'products' in your Supabase project
     const { data, error } = await supabase.storage
       .from("products")
-      .upload(filename, buffer, {
+      .upload(filename, file, {
         contentType: file.type || "image/jpeg",
         cacheControl: "3600",
         upsert: false
