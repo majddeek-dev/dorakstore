@@ -6,15 +6,15 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const page = searchParams.get('page');
-    const limit = searchParams.get('limit') || 10;
+    const limit = searchParams.get('limit') || 20;
 
-    const where = category && category !== 'all' 
-      ? { OR: [{ category }, { categoryId: category }] } 
+    const where = category && category !== 'all'
+      ? { OR: [{ category }, { categoryId: category }] }
       : {};
 
     if (page) {
       const pageNum = parseInt(page) || 1;
-      const limitNum = parseInt(limit) || 10;
+      const limitNum = parseInt(limit) || 20;
       const skip = (pageNum - 1) * limitNum;
 
       const [products, totalCount] = await Promise.all([
