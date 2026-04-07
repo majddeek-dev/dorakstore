@@ -9,7 +9,7 @@ export default function AccountPage() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "", phone: "" });
   const [error, setError] = useState("");
   const [fetching, setFetching] = useState(false);
-  
+
   const router = useRouter();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function AccountPage() {
     setError("");
     setFetching(true);
     const endpoint = view === "login" ? "/api/auth/login" : "/api/auth/register";
-    
+
     try {
       const res = await fetch(endpoint, {
         method: "POST",
@@ -107,19 +107,19 @@ export default function AccountPage() {
       <div style={{ width: "100%", maxWidth: "420px", background: "#fff", border: "1px solid #eee", padding: "3rem", borderRadius: "20px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
         <h2 style={{ textAlign: "center", fontSize: "1.8rem", fontWeight: 800, marginBottom: "0.5rem" }}>{view === "login" ? "تسجيل الدخول" : "إنشاء حساب الجديد"}</h2>
         <p style={{ textAlign: "center", color: "#666", marginBottom: "2rem" }}>{view === "login" ? "أهلاً بك مجدداً في متجرنا الرقمي" : "انضم ليتم تتبع طلباتك بكل سهولة"}</p>
-        
+
         {error && <div style={{ background: "#fee2e2", color: "#b91c1c", padding: "0.8rem", borderRadius: "8px", fontSize: "0.9rem", marginBottom: "1.5rem", textAlign: "center" }}>{error}</div>}
 
         <form onSubmit={handleAuth} style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
           {view === "register" && (
-            <input type="text" placeholder="الاسم الكامل" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={inputStyle} />
+            <input type="text" placeholder="الاسم الكامل" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} style={inputStyle} />
           )}
-          <input type="email" placeholder="البريد الإلكتروني" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} style={inputStyle} />
+          <input type="email" placeholder="البريد الإلكتروني" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={inputStyle} />
           {view === "register" && (
-             <input type="tel" placeholder="رقم الهاتف (اختياري)" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} style={inputStyle} />
+            <input type="tel" placeholder="رقم الهاتف (اختياري)" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} style={inputStyle} />
           )}
-          <input type="password" placeholder="كلمة المرور" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} style={inputStyle} />
-          
+          <input type="password" placeholder="كلمة المرور" required value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} style={inputStyle} />
+
           <button type="submit" disabled={fetching} style={{ background: "#111", color: "#fff", padding: "1rem", borderRadius: "10px", fontSize: "1rem", fontWeight: 700, border: "none", cursor: "pointer", marginTop: "0.5rem" }}>
             {fetching ? "جاري المعالجة..." : view === "login" ? "تسجيل الدخول" : "إنشاء الحساب"}
           </button>
@@ -169,4 +169,4 @@ function OrderCard({ order }) {
 }
 
 const centerStyle = { minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#888" };
-const inputStyle = { padding: "0.9rem", border: "1px solid #e5e7eb", borderRadius: "10px", fontSize: "0.95rem", outline: "none", transition: "border-color 0.2s" };
+const inputStyle = { padding: "0.9rem", border: "1px solid #000000ff", borderRadius: "10px", fontSize: "0.95rem", outline: "none", transition: "border-color 0.2s" };

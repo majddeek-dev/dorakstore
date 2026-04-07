@@ -60,7 +60,7 @@ export default function ContactPage() {
           {/* Subtle Glow */}
           <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%)', borderRadius: '50%' }} />
 
-          <h2 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '1.5rem' }}>هل تحتاج لمساعدة فورية؟</h2>
+          <h2 style={{ color: '#000000ff', fontSize: '2rem', fontWeight: 900, marginBottom: '1.5rem' }}>هل تحتاج لمساعدة فورية؟</h2>
           <p style={{ color: '#555', marginBottom: '2.5rem', fontSize: '1.1rem', lineHeight: 1.6 }}>
             فريق الدعم الفني متواجد طوال أيام الأسبوع على مدار الساعة لخدمتكم.
           </p>
