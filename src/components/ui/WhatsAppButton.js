@@ -2,7 +2,7 @@ import styles from "./WhatsAppButton.module.css";
 
 export default function WhatsAppButton() {
   const phoneNumber = "+970569749171";
-  const message = encodeURIComponent("مرحباً، لدي استفسار بخصوص منتجات DK7 Store.");
+  const message = encodeURIComponent("مرحباً، لدي استفسار بخصوص منتجات Dorak Store.");
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
 
   return (

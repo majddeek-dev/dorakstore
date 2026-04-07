@@ -37,9 +37,11 @@ export default function AdminLayout({ children }) {
           <Link href="/admin" className={pathname === '/admin' ? styles.active : ''}>لوحة القيادة</Link>
           <Link href="/admin/orders" className={pathname.startsWith('/admin/orders') ? styles.active : ''}>الطلبات</Link>
           <Link href="/admin/products" className={pathname.startsWith('/admin/products') ? styles.active : ''}>المنتجات</Link>
+          <Link href="/admin/contact-products" className={pathname.startsWith('/admin/contact-products') ? styles.active : ''}>منتجات التواصل</Link>
           <Link href="/admin/customers" className={pathname.startsWith('/admin/customers') ? styles.active : ''}>العملاء</Link>
           <Link href="/admin/discounts" className={pathname.startsWith('/admin/discounts') ? styles.active : ''}>خصومات</Link>
           <Link href="/admin/categories" className={pathname.startsWith('/admin/categories') ? styles.active : ''}>الفئات</Link>
+          <Link href="/admin/accounting" className={pathname.startsWith('/admin/accounting') ? styles.active : ''}>الفئات</Link>
           <Link href="/" className={`${styles.storeLink} ${pathname === '/' ? styles.active : ''}`}>العودة للمتجر</Link>
         </nav>
         <button
