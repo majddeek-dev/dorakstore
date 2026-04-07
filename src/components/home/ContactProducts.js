@@ -28,10 +28,10 @@ export default function ContactProducts() {
     <section className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>🚀 منتجات متوفرة عند الطلب</h2>
-          <p style={{ color: "#666", marginTop: "0.5rem" }}>تواصل معنا عبر الواتساب لطلب هذه العروض الخاصة</p>
+          <h2 className={styles.title}>🚀 حصريات</h2>
+          <p style={{ color: "#666", marginTop: "0.5rem" }}>تواصل معنا عبر الواتساب لطلب</p>
         </div>
-        
+
         <div className={styles.grid}>
           {products.map(p => {
             const phoneNumber = p.whatsappNum || DEFAULT_WHATSAPP;

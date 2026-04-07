@@ -1,6 +1,7 @@
 .section {
   padding: 2rem 2rem 4rem;
-  background-color: rgba(37, 211, 102, 0.05); /* very light green tint for whatsapp theme */
+  background-color: var(--background);
+  /* very light green tint for whatsapp theme */
 }
 
 .container {
@@ -18,7 +19,8 @@
   font-weight: 800;
   position: relative;
   display: inline-block;
-  color: #075e54; /* whatsapp dark green */
+  color: #ffffff;
+  /* whatsapp dark green */
 }
 
 .grid {
@@ -33,10 +35,12 @@
 .grid::-webkit-scrollbar {
   height: 8px;
 }
+
 .grid::-webkit-scrollbar-thumb {
   background-color: rgba(37, 211, 102, 0.6);
   border-radius: 10px;
 }
+
 .grid::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0.05);
   border-radius: 10px;
@@ -58,7 +62,8 @@
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* slightly stronger shadow for dark mode compatibility */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  /* slightly stronger shadow for dark mode compatibility */
 }
 
 .imageWrap {
@@ -131,7 +136,8 @@
   margin-top: auto;
   width: 100%;
   padding: 0.75rem;
-  background-color: #25D366; /* WhatsApp Green */
+  background-color: #25D366;
+  /* WhatsApp Green */
   color: #fff;
   border: none;
   font-weight: 700;
