@@ -66,10 +66,10 @@ export default function AccountPage() {
       <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "4rem 2rem", direction: "rtl", fontFamily: "'Tajawal', sans-serif" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
           <div>
-            <h1 style={{ fontSize: "2rem", fontWeight: 800, margin: 0 }}>مرحباً، {session.user.name} 👋</h1>
-            <p style={{ color: "#666", marginTop: "0.5rem" }}>أهلاً بك في حسابك الشخصي بمتجر DK7.</p>
+            <h1 style={{ fontSize: "2rem", fontWeight: 800, margin: 0, color: "var(--foreground)" }}>مرحباً، {session.user.name} 👋</h1>
+            <p style={{ color: "var(--foreground)", opacity: 0.8, marginTop: "0.5rem" }}>أهلاً بك في حسابك الشخصي بالمتجر.</p>
           </div>
-          <button onClick={handleLogout} style={{ border: "1px solid #ddd", background: "none", padding: "0.6rem 1.2rem", borderRadius: "8px", fontWeight: 600, cursor: "pointer" }}>تسجيل الخروج</button>
+          <button onClick={handleLogout} style={{ border: "1px solid #ddd", background: "none", padding: "0.6rem 1.2rem", borderRadius: "8px", fontWeight: 600, cursor: "pointer", color: "var(--foreground)" }}>تسجيل الخروج</button>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "2.5rem" }}>
@@ -88,7 +88,7 @@ export default function AccountPage() {
 
           {/* Orders */}
           <main>
-            <h3 style={{ marginBottom: "1.5rem" }}>تاريخ الطلبات ({session.orders.length})</h3>
+            <h3 style={{ marginBottom: "1.5rem", color: "var(--foreground)" }}>تاريخ الطلبات ({session.orders.length})</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
               {session.orders.length === 0 ? (
                 <div style={{ padding: "4rem", textAlign: "center", background: "#fafafa", borderRadius: "16px", color: "#999" }}>لا يوجد لديك طلبات سابقة بعد.</div>

@@ -7,8 +7,8 @@ export default function ContactPage() {
   return (
     <div style={{ direction: 'rtl', fontFamily: "'Tajawal', sans-serif", padding: '5rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-        <h1 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '1rem', color: '#111' }}>تواصل معنا 📞</h1>
-        <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '700px', margin: '0 auto', lineHeight: 1.6 }}>
+        <h1 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '1rem', color: 'var(--foreground)' }}>تواصل معنا 📞</h1>
+        <p style={{ fontSize: '1.2rem', color: 'var(--foreground)', opacity: 0.8, maxWidth: '700px', margin: '0 auto', lineHeight: 1.6 }}>
           نحن دائماً هنا لمساعدتك! سواء كان لديك استفسار عن منتج، أو تود تتبع طلبك، فريقنا جاهز للرد عليك في أسرع وقت.
         </p>
       </div>
