@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { name, price, oldPrice, imageUrl, whatsappNum } = body;
 
@@ -29,7 +29,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await prisma.contactProduct.delete({
       where: { id }
     });
