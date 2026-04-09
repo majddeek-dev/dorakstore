@@ -51,7 +51,7 @@ export default function Footer() {
       <div className={styles.bottom}>
         <p>&copy; {new Date().getFullYear()} Dorak Store. جميع الحقوق محفوظة.</p>
         <p>
-          برمجة و تطوير بواسطة <a href="https://www.instagram.com/majd_deek.16/">مجد الديك</a>
+          برمجة و تطوير بواسطة <a href="https://majddeek.vercel.app/">مجد الديك</a>
         </p>
       </div>
     </footer>
