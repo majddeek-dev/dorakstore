@@ -58,7 +58,7 @@ export default function ContactProducts() {
                     ) : (
                       <span className={styles.price} style={{ color: "#aaa", fontSize: "0.95rem" }}>السعر عند التواصل</span>
                     )}
-                    {p.oldPrice && <span className={styles.oldPrice}>{p.oldPrice} ₪</span>}
+                    {!!p.oldPrice && p.price && p.oldPrice > p.price && <span className={styles.oldPrice}>{p.oldPrice} ₪</span>}
                   </div>
                   <a href={waLink} target="_blank" rel="noopener noreferrer" className={styles.waButton}>
                     💬 اطلب عبر الواتساب

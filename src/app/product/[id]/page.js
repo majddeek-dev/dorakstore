@@ -89,11 +89,13 @@ export default function ProductDetails() {
           <h1 className={styles.title}>{product.name}</h1>
           <div className={styles.pricing}>
             <span className={styles.price}>{product.price} ₪</span>
-            {product.oldPrice && <span className={styles.oldPrice}>{product.oldPrice} ₪</span>}
-            {product.oldPrice && (
-              <span className={styles.discount}>
-                وفّر {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
-              </span>
+            {!!product.oldPrice && product.oldPrice > product.price && (
+              <>
+                <span className={styles.oldPrice}>{product.oldPrice} ₪</span>
+                <span className={styles.discount}>
+                  وفّر {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
+                </span>
+              </>
             )}
           </div>
 

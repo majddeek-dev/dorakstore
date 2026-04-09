@@ -35,7 +35,7 @@ export default function ProductCard({ id, name, price, oldPrice, imageUrl, badge
           <h3 className={styles.name}>{name}</h3>
         </Link>
         <div className={styles.pricing}>
-          {user && memberPrice ? (
+          {user && memberPrice && memberDiscountPercent > 0 ? (
             <>
               <span className={styles.price}>{memberPrice.toFixed(2)} ₪</span>
               <span className={styles.oldPrice} style={{ textDecoration: 'line-through', fontSize: '0.8rem' }}>{price} ₪</span>
@@ -43,7 +43,7 @@ export default function ProductCard({ id, name, price, oldPrice, imageUrl, badge
           ) : (
             <>
               <span className={styles.price}>{price} ₪</span>
-              {oldPrice && <span className={styles.oldPrice}>{oldPrice} ₪</span>}
+              {!!oldPrice && oldPrice > price && <span className={styles.oldPrice}>{oldPrice} ₪</span>}
             </>
           )}
         </div>
