@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useCart } from "@/lib/CartContext";
 import styles from "./ProductCard.module.css";
 
-export default function ProductCard({ id, name, price, oldPrice, imageUrl, badge }) {
+export default function ProductCard({ id, name, price, oldPrice, imageUrl, badge, priceRules }) {
   const { addItem, user, memberDiscountPercent } = useCart();
 
   const memberPrice = user ? price * (1 - memberDiscountPercent / 100) : null;
@@ -12,6 +12,10 @@ export default function ProductCard({ id, name, price, oldPrice, imageUrl, badge
     e.preventDefault();
     addItem({ id, name, price, imageUrl });
   }
+
+  // Find the best quantity rule if any exists
+  const hasRules = priceRules && priceRules.length > 0;
+  const bestRule = hasRules ? priceRules.reduce((prev, current) => (prev.discountPercent > current.discountPercent) ? prev : current) : null;
 
   return (
     <div className={styles.card}>
@@ -47,6 +51,11 @@ export default function ProductCard({ id, name, price, oldPrice, imageUrl, badge
             </>
           )}
         </div>
+        {hasRules && (
+          <div style={{ background: "#ecfdf5", color: "#065f46", fontSize: "0.8rem", padding: "4px 8px", borderRadius: "4px", margin: "0.5rem 0", fontWeight: 600, textAlign: "center" }}>
+            🔥 خصم الكمية: اشتر {bestRule.quantity} واحصل على خصم {bestRule.discountPercent}%
+          </div>
+        )}
         <button className={styles.addToCart} onClick={handleAdd} aria-label="أضف إلى السلة">
           🛒 أضف إلى السلة
         </button>

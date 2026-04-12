@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./Hero.module.css";
 
 const IMAGES = ["/hero1.jpg", "/hero2.jpg", "/hero3.jpg"];
@@ -18,11 +19,16 @@ export default function Hero() {
   return (
     <section className={styles.hero}>
       {IMAGES.map((img, i) => (
-        <div
-          key={img}
-          className={`${styles.bgLayer} ${i === index ? styles.active : ""}`}
-          style={{ backgroundImage: `url(${img})` }}
-        />
+        <div key={img} className={`${styles.bgLayer} ${i === index ? styles.active : ""}`}>
+          <Image 
+            src={img} 
+            alt={`Hero background ${i+1}`} 
+            fill 
+            priority={i === 0}
+            quality={100}
+            style={{ objectFit: 'cover' }} 
+          />
+        </div>
       ))}
       <div className={styles.overlay} />
 

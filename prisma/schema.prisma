@@ -21,10 +21,15 @@ model Product {
   desc        String?
   stock       Int       @default(0)
   imageUrl    String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  publishAt   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   
-  orderItems OrderItem[]
+  orderItems  OrderItem[]
+  comboItems  ComboItem[]
+  priceRules  PriceRule[]
 }
 
 model Order {
@@ -111,3 +116,35 @@ model ContactProduct {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+// نظام الكومبو - خصم عند شراء عدة منتجات معاً
+model Combo {
+  id              String      @id @default(cuid())
+  name            String
+  description     String?
+  discountPercent Float
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  items           ComboItem[]
+}
+
+model ComboItem {
+  id        String  @id @default(cuid())
+  comboId   String
+  productId String
+  quantity  Int     @default(1)
+  combo     Combo   @relation(fields: [comboId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+// نظام السعر على الكمية
+model PriceRule {
+  id        String  @id @default(cuid())
+  productId String
+  minQty    Int
+  price     Float
+  label     String?
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+

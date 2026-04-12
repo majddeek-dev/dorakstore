@@ -7,6 +7,7 @@ const statCards = [
   { key: "pendingOrders", label: "طلبات قيد المعالجة", icon: "⏳", fmt: v => v, color: "#f59e0b" },
   { key: "totalProducts", label: "إجمالي المنتجات", icon: "📦", fmt: v => v, color: "#6366f1" },
   { key: "totalCustomers", label: "العملاء الفريدون", icon: "👥", fmt: v => v, color: "#3b82f6" },
+  { key: "totalCombos", label: "عروض الكومبو", icon: "🎁", fmt: v => v, color: "#ec4899" },
 ];
 
 export default function AdminDashboard() {

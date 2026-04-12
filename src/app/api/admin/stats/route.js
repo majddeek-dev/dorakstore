@@ -3,9 +3,10 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const [totalOrders, totalProducts, orders] = await Promise.all([
+    const [totalOrders, totalProducts, totalCombos, orders] = await Promise.all([
       prisma.order.count(),
       prisma.product.count(),
+      prisma.combo.count(),
       prisma.order.findMany({
         select: { total: true, status: true, createdAt: true },
       }),
@@ -34,6 +35,7 @@ export async function GET() {
       pendingOrders,
       todayRevenue,
       totalCustomers: uniqueCustomers.length,
+      totalCombos
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -1,7 +1,94 @@
 "use client";
 import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
-const EMPTY_FORM = { name: "", categoryId: "", price: "", costPrice: "", oldPrice: "", badge: "", desc: "", stock: "", imageUrl: "" };
+const EMPTY_FORM = { name: "", categoryId: "", price: "", costPrice: "", oldPrice: "", badge: "", desc: "", stock: "", imageUrl: "", isActive: true, publishAt: "" };
+
+function SortableItem({ id, p, getCatName, openEdit, handleDelete, deleteId, toggleActive }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 1,
+    borderTop: "1px solid #f0f0f0", 
+    color: "#333",
+    background: isDragging ? "#f9fafb" : "transparent"
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style}>
+      <td style={{ padding: "0.9rem 0.5rem", cursor: "grab", textAlign: "center" }} {...attributes} {...listeners}>
+        <span style={{ color: "#aaa" }}>☰</span>
+      </td>
+      <td style={{ padding: "0.9rem 1.2rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{ width: "40px", height: "40px", background: "#f3f4f6", borderRadius: "4px", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {p.imageUrl ? <img src={p.imageUrl} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt={p.name} /> : "📦"}
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: "0.95rem" }}>{p.name}</div>
+            {p.desc && <div style={{ fontSize: "0.78rem", color: "#aaa", marginTop: "2px", maxWidth: "220px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.desc}</div>}
+          </div>
+        </div>
+      </td>
+      <td style={{ padding: "0.9rem 1.2rem" }}>
+        <span style={{ background: "#f3f4f6", padding: "3px 10px", borderRadius: "20px", fontSize: "0.82rem" }}>{getCatName(p)}</span>
+      </td>
+      <td style={{ padding: "0.9rem 1.2rem" }}>
+        <span style={{ fontWeight: 700 }}>{p.price} ₪</span>
+        {p.oldPrice && <span style={{ marginRight: "6px", color: "#aaa", textDecoration: "line-through", fontSize: "0.85rem" }}>{p.oldPrice} ₪</span>}
+      </td>
+      <td style={{ padding: "0.9rem 1.2rem" }}>
+        <span style={{ fontWeight: 700, color: p.stock === 0 ? "#dc2626" : p.stock <= 5 ? "#d97706" : "#059669" }}>
+          {p.stock === 0 ? "نفد" : p.stock}
+        </span>
+      </td>
+      <td style={{ padding: "0.9rem 1.2rem" }}>
+        <button 
+          onClick={() => toggleActive(p)}
+          style={{ 
+            background: p.isActive ? "#d1fae5" : "#fee2e2", 
+            color: p.isActive ? "#065f46" : "#991b1b",
+            border: "none", padding: "3px 10px", borderRadius: "20px", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" 
+          }}
+        >
+          {p.isActive ? "نشط" : "معطّل"}
+        </button>
+      </td>
+      <td style={{ padding: "0.9rem 1.2rem" }}>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <button onClick={() => openEdit(p)} style={btnSmall("#6366f1")}>تعديل</button>
+          <button onClick={() => handleDelete(p.id)} disabled={deleteId === p.id} style={btnSmall("#dc2626")}>
+            {deleteId === p.id ? "..." : "حذف"}
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -16,16 +103,26 @@ export default function AdminProducts() {
   const [msg, setMsg] = useState("");
   const fileInputRef = useRef(null);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const [pRes, cRes] = await Promise.all([
-        fetch("/api/products"),
+        fetch("/api/products?admin=true"), // fetch all even inactive
         fetch("/api/admin/categories")
       ]);
       const [pData, cData] = await Promise.all([pRes.json(), cRes.json()]);
       
-      setProducts(Array.isArray(pData) ? pData : []);
+      // Sort client-side by sortOrder if available
+      const sortedProducts = (Array.isArray(pData) ? pData : []).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      
+      setProducts(sortedProducts);
       setCategories(Array.isArray(cData) ? cData : []);
     } catch (err) {
       console.error("Failed to load admin data", err);
@@ -47,6 +144,8 @@ export default function AdminProducts() {
       price: String(p.price), costPrice: String(p.costPrice || "0"), oldPrice: p.oldPrice ? String(p.oldPrice) : "",
       badge: p.badge || "", desc: p.desc || "",
       stock: String(p.stock), imageUrl: p.imageUrl || "",
+      isActive: p.isActive, 
+      publishAt: p.publishAt ? new Date(p.publishAt).toISOString().slice(0, 16) : ""
     });
     setModal("edit");
   }
@@ -90,7 +189,7 @@ export default function AdminProducts() {
       const payload = {
         name: form.name, 
         categoryId: form.categoryId,
-        category: selectedCat ? selectedCat.name : "Uncategorized", // Fallback for backward compatibility
+        category: selectedCat ? selectedCat.name : "Uncategorized", 
         price: parseFloat(form.price),
         costPrice: parseFloat(form.costPrice || "0"),
         oldPrice: form.oldPrice ? parseFloat(form.oldPrice) : null,
@@ -98,7 +197,10 @@ export default function AdminProducts() {
         desc: form.desc || null,
         stock: parseInt(form.stock || "0"),
         imageUrl: form.imageUrl || null,
+        isActive: form.isActive,
+        publishAt: form.publishAt ? new Date(form.publishAt).toISOString() : null
       };
+      
       const url = modal === "edit" ? `/api/products/${form.id}` : "/api/products";
       const method = modal === "edit" ? "PUT" : "POST";
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
@@ -122,6 +224,46 @@ export default function AdminProducts() {
     } finally { setDeleteId(null); }
   }
 
+  async function toggleActive(p) {
+    try {
+      const res = await fetch(`/api/products/${p.id}`, { 
+        method: "PUT", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ isActive: !p.isActive }) 
+      });
+      if (res.ok) { 
+        setProducts(products.map(item => item.id === p.id ? { ...item, isActive: !p.isActive } : item));
+        flash(`✅ تم ${!p.isActive ? "تفعيل" : "تعطيل"} المنتج`); 
+      }
+    } catch(e) {
+      alert("حدث خطأ");
+    }
+  }
+
+  async function handleDragEnd(event) {
+    const { active, over } = event;
+    
+    if (active.id !== over.id) {
+      setProducts((items) => {
+        const oldIndex = items.findIndex(i => i.id === active.id);
+        const newIndex = items.findIndex(i => i.id === over.id);
+        const newItems = arrayMove(items, oldIndex, newIndex);
+        
+        // Update sortOrder on the backend
+        const payload = newItems.map((item, index) => ({ id: item.id, sortOrder: index }));
+        fetch('/api/admin/products/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(r => {
+          if(r.ok) flash("✅ تم تحديث ترتيب المنتجات");
+        });
+
+        return newItems;
+      });
+    }
+  }
+
   const filtered = products.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
     (p.category && p.category.toLowerCase().includes(search.toLowerCase()))
@@ -138,7 +280,7 @@ export default function AdminProducts() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
         <div>
           <h1 style={{ fontSize: "1.8rem", fontWeight: 800, color: "#111", margin: 0 }}>إدارة المخزون</h1>
-          <p style={{ color: "#888", fontSize: "0.9rem", margin: "0.2rem 0 0" }}>{products.length} منتج في المتجر</p>
+          <p style={{ color: "#888", fontSize: "0.9rem", margin: "0.2rem 0 0" }}>{products.length} منتج في المتجر (يمكنك سحب المنتج لترتيبه)</p>
         </div>
         <button onClick={openAdd} style={btnStyle("#111")}>+ إضافة منتج جديد</button>
       </div>
@@ -154,67 +296,37 @@ export default function AdminProducts() {
         />
       </div>
 
-      {/* Table */}
+      {/* Table with DnD */}
       <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", overflow: "hidden" }}>
         {loading ? (
           <div style={{ padding: "3rem", textAlign: "center", color: "#999" }}>جاري التحميل...</div>
         ) : (
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "right", minWidth: "700px" }}>
-              <thead>
-                <tr style={{ background: "#fafafa", color: "#888", fontSize: "0.85rem" }}>
-                  <th style={{ padding: "0.9rem 1.2rem" }}>المنتج</th>
-                  <th style={{ padding: "0.9rem 1.2rem" }}>الفئة</th>
-                  <th style={{ padding: "0.9rem 1.2rem" }}>السعر</th>
-                  <th style={{ padding: "0.9rem 1.2rem" }}>المخزون</th>
-                  <th style={{ padding: "0.9rem 1.2rem" }}>الشارة</th>
-                  <th style={{ padding: "0.9rem 1.2rem" }}>الإجراءات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(p => (
-                  <tr key={p.id} style={{ borderTop: "1px solid #f0f0f0", color: "#333" }}>
-                    <td style={{ padding: "0.9rem 1.2rem" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <div style={{ width: "40px", height: "40px", background: "#f3f4f6", borderRadius: "4px", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          {p.imageUrl ? <img src={p.imageUrl} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "📦"}
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: "0.95rem" }}>{p.name}</div>
-                          {p.desc && <div style={{ fontSize: "0.78rem", color: "#aaa", marginTop: "2px", maxWidth: "220px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.desc}</div>}
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ padding: "0.9rem 1.2rem" }}>
-                      <span style={{ background: "#f3f4f6", padding: "3px 10px", borderRadius: "20px", fontSize: "0.82rem" }}>{getCatName(p)}</span>
-                    </td>
-                    <td style={{ padding: "0.9rem 1.2rem" }}>
-                      <span style={{ fontWeight: 700 }}>{p.price} ₪</span>
-                      {p.oldPrice && <span style={{ marginRight: "6px", color: "#aaa", textDecoration: "line-through", fontSize: "0.85rem" }}>{p.oldPrice} ₪</span>}
-                    </td>
-                    <td style={{ padding: "0.9rem 1.2rem" }}>
-                      <span style={{ fontWeight: 700, color: p.stock === 0 ? "#dc2626" : p.stock <= 5 ? "#d97706" : "#059669" }}>
-                        {p.stock === 0 ? "نفد" : p.stock}
-                      </span>
-                    </td>
-                    <td style={{ padding: "0.9rem 1.2rem" }}>
-                      {p.badge ? <span style={{ background: "#f3f4f6", padding: "2px 8px", borderRadius: "4px", fontSize: "0.8rem" }}>{p.badge}</span> : <span style={{ color: "#ddd" }}>—</span>}
-                    </td>
-                    <td style={{ padding: "0.9rem 1.2rem" }}>
-                      <div style={{ display: "flex", gap: "0.5rem" }}>
-                        <button onClick={() => openEdit(p)} style={btnSmall("#6366f1")}>تعديل</button>
-                        <button onClick={() => handleDelete(p.id)} disabled={deleteId === p.id} style={btnSmall("#dc2626")}>
-                          {deleteId === p.id ? "..." : "حذف"}
-                        </button>
-                      </div>
-                    </td>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "right", minWidth: "700px" }}>
+                <thead>
+                  <tr style={{ background: "#fafafa", color: "#888", fontSize: "0.85rem" }}>
+                    <th style={{ padding: "0.9rem 0.5rem", width: "30px" }}>↕</th>
+                    <th style={{ padding: "0.9rem 1.2rem" }}>المنتج</th>
+                    <th style={{ padding: "0.9rem 1.2rem" }}>الفئة</th>
+                    <th style={{ padding: "0.9rem 1.2rem" }}>السعر</th>
+                    <th style={{ padding: "0.9rem 1.2rem" }}>المخزون</th>
+                    <th style={{ padding: "0.9rem 1.2rem" }}>الحالة</th>
+                    <th style={{ padding: "0.9rem 1.2rem" }}>الإجراءات</th>
                   </tr>
-                ))}
-                {filtered.length === 0 && (
-                  <tr><td colSpan={6} style={{ padding: "2.5rem", textAlign: "center", color: "#bbb" }}>لا توجد منتجات</td></tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <SortableContext items={filtered.map(p => p.id)} strategy={verticalListSortingStrategy}>
+                  <tbody>
+                    {filtered.map(p => (
+                      <SortableItem key={p.id} id={p.id} p={p} getCatName={getCatName} openEdit={openEdit} handleDelete={handleDelete} deleteId={deleteId} toggleActive={toggleActive} />
+                    ))}
+                    {filtered.length === 0 && (
+                      <tr><td colSpan={7} style={{ padding: "2.5rem", textAlign: "center", color: "#bbb" }}>لا توجد منتجات</td></tr>
+                    )}
+                  </tbody>
+                </SortableContext>
+              </table>
+            </DndContext>
           </div>
         )}
       </div>
@@ -241,7 +353,7 @@ export default function AdminProducts() {
                   }}
                 >
                   {form.imageUrl ? (
-                    <img src={form.imageUrl} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <img src={form.imageUrl} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="preview" />
                   ) : (
                     <span style={{ fontSize: "2rem", opacity: 0.3 }}>{uploading ? "⏳" : "📷"}</span>
                   )}
@@ -251,6 +363,20 @@ export default function AdminProducts() {
                 <button type="button" onClick={() => fileInputRef.current.click()} style={{ background: "none", border: "none", color: "#6366f1", fontSize: "0.85rem", fontWeight: 700, marginTop: "0.5rem", cursor: "pointer" }}>
                   {form.imageUrl ? "تغيير الصورة" : "اضغط لرفع صورة"}
                 </button>
+              </div>
+
+              <div style={{ display: "flex", gap: "1rem" }}>
+                <div style={{ flex: 1 }}>
+                  <label style={lblClass}>حالة المنتج</label>
+                  <select value={form.isActive} onChange={e => setForm(prev => ({ ...prev, isActive: e.target.value === 'true' }))} style={inpClass}>
+                    <option value="true">نشط (يظهر في المتجر)</option>
+                    <option value="false">مسودّة (مخفي)</option>
+                  </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={lblClass}>موعد النشر (اختياري)</label>
+                  <input type="datetime-local" value={form.publishAt} onChange={e => setForm({...form, publishAt: e.target.value})} style={inpClass} />
+                </div>
               </div>
 
               {[
@@ -263,27 +389,25 @@ export default function AdminProducts() {
                 { label: "رابط الصورة (اختياري)", key: "imageUrl" },
               ].map(f => (
                 <div key={f.key}>
-                  <label style={{ display: "block", fontWeight: 600, marginBottom: "0.4rem", fontSize: "0.9rem", color: "#555" }}>{f.label}</label>
+                  <label style={lblClass}>{f.label}</label>
                   <input
                     type={f.type || "text"} required={f.required}
                     value={form[f.key]} onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
-                    style={{ width: "100%", padding: "0.75rem", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "0.95rem", fontFamily: "'Tajawal', sans-serif", boxSizing: "border-box" }}
+                    style={inpClass}
                     placeholder={f.key === "imageUrl" ? "أو ضع رابطاً مباشراً هنا" : ""}
                   />
                 </div>
               ))}
               <div>
-                <label style={{ display: "block", fontWeight: 600, marginBottom: "0.4rem", fontSize: "0.9rem", color: "#555" }}>الفئة *</label>
-                <select required value={form.categoryId} onChange={e => setForm(prev => ({ ...prev, categoryId: e.target.value }))}
-                  style={{ width: "100%", padding: "0.75rem", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "0.95rem", fontFamily: "'Tajawal', sans-serif" }}>
+                <label style={lblClass}>الفئة *</label>
+                <select required value={form.categoryId} onChange={e => setForm(prev => ({ ...prev, categoryId: e.target.value }))} style={inpClass}>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   {categories.length === 0 && <option value="">لا يوجد فئات - أضف واحدة أولاً</option>}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontWeight: 600, marginBottom: "0.4rem", fontSize: "0.9rem", color: "#555" }}>الوصف</label>
-                <textarea value={form.desc} onChange={e => setForm(prev => ({ ...prev, desc: e.target.value }))} rows={3}
-                  style={{ width: "100%", padding: "0.75rem", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "0.95rem", fontFamily: "'Tajawal', sans-serif", resize: "vertical", boxSizing: "border-box" }} />
+                <label style={lblClass}>الوصف</label>
+                <textarea value={form.desc} onChange={e => setForm(prev => ({ ...prev, desc: e.target.value }))} rows={3} style={{ ...inpClass, resize: "vertical" }} />
               </div>
               <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
                 <button type="submit" disabled={saving || uploading} style={{ ...btnStyle("#111"), flex: 1, padding: "0.85rem", fontSize: "1rem" }}>
@@ -298,6 +422,9 @@ export default function AdminProducts() {
     </div>
   );
 }
+
+const lblClass = { display: "block", fontWeight: 600, marginBottom: "0.4rem", fontSize: "0.9rem", color: "#555" };
+const inpClass = { width: "100%", padding: "0.75rem", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "0.95rem", fontFamily: "'Tajawal', sans-serif", boxSizing: "border-box" };
 
 function btnStyle(bg) {
   return { background: bg, color: "#fff", border: "none", padding: "0.65rem 1.3rem", borderRadius: "8px", fontWeight: 700, cursor: "pointer", fontFamily: "'Tajawal', sans-serif", fontSize: "0.95rem", transition: "opacity 0.2s" };
