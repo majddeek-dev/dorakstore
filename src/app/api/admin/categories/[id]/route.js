@@ -4,12 +4,12 @@ import { prisma } from "@/lib/prisma";
 export async function PUT(req, { params }) {
   try {
     const { id } = await params;
-    const { name } = await req.json();
+    const { name, imageUrl } = await req.json();
     if (!name) return NextResponse.json({ error: "Name required" }, { status: 400 });
 
     const cat = await prisma.category.update({
       where: { id },
-      data: { name },
+      data: { name, imageUrl: imageUrl || null },
     });
     return NextResponse.json(cat);
   } catch (error) {

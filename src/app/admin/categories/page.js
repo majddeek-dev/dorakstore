@@ -5,9 +5,10 @@ export default function AdminCategories() {
   const [cats, setCats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null); // null | "add" | "edit"
-  const [form, setForm] = useState({ id: "", name: "" });
+  const [form, setForm] = useState({ id: "", name: "", imageUrl: "" });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const [showHomeCategories, setShowHomeCategories] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -15,6 +16,12 @@ export default function AdminCategories() {
       const res = await fetch("/api/admin/categories");
       const data = await res.json();
       setCats(Array.isArray(data) ? data : []);
+      
+      const setRes = await fetch("/api/admin/settings");
+      const setData = await setRes.json();
+      if (setData.showHomeCategories !== undefined) {
+        setShowHomeCategories(setData.showHomeCategories === "true");
+      }
     } finally {
       setLoading(false);
     }
@@ -24,9 +31,25 @@ export default function AdminCategories() {
 
   const flash = (t) => { setMsg(t); setTimeout(() => setMsg(""), 3000); };
 
-  function openAdd() { setForm({ id: "", name: "" }); setModal("add"); }
-  function openEdit(c) { setForm({ id: c.id, name: c.name }); setModal("edit"); }
-  function closeModal() { setModal(null); setForm({ id: "", name: "" }); }
+  async function toggleHomeCategories() {
+    const newValue = !showHomeCategories;
+    setShowHomeCategories(newValue); // Optimistic UI update
+    try {
+      await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "showHomeCategories", value: newValue.toString() })
+      });
+      flash(newValue ? "👁️ تم إظهار الفئات في الشاشة الرئيسية" : "👁️‍🗨️ تم إخفاء الفئات من الشاشة الرئيسية");
+    } catch (e) {
+      alert("حدث خطأ أثناء حفظ الإعدادات");
+      setShowHomeCategories(!newValue);
+    }
+  }
+
+  function openAdd() { setForm({ id: "", name: "", imageUrl: "" }); setModal("add"); }
+  function openEdit(c) { setForm({ id: c.id, name: c.name, imageUrl: c.imageUrl || "" }); setModal("edit"); }
+  function closeModal() { setModal(null); setForm({ id: "", name: "", imageUrl: "" }); }
 
   async function handleSave(e) {
     e.preventDefault();
@@ -37,7 +60,7 @@ export default function AdminCategories() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name }),
+        body: JSON.stringify({ name: form.name, imageUrl: form.imageUrl }),
       });
       if (res.ok) {
         closeModal();
@@ -63,12 +86,20 @@ export default function AdminCategories() {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
         <div>
           <h1 style={{ fontSize: "1.8rem", fontWeight: 800 }}>إدارة الفئات</h1>
           <p style={{ color: "#888" }}>إجمالي الفئات: {cats.length}</p>
         </div>
-        <button onClick={openAdd} style={btnStyle("#111")}>+ إضافة فئة جديدة</button>
+        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+          <button 
+            onClick={toggleHomeCategories} 
+            style={{ ...btnStyle(showHomeCategories ? "#dc2626" : "#10b981"), display: "flex", alignItems: "center", gap: "0.5rem" }}
+          >
+            {showHomeCategories ? "إخفاء الفئات من الرئيسية 👁️‍🗨️" : "إظهار الفئات في الرئيسية 👁️"}
+          </button>
+          <button onClick={openAdd} style={btnStyle("#111")}>+ إضافة فئة جديدة</button>
+        </div>
       </div>
 
       {msg && <div style={{ background: "#d1fae5", color: "#065f46", padding: "1rem", borderRadius: "8px", marginBottom: "1.5rem" }}>{msg}</div>}
@@ -80,6 +111,7 @@ export default function AdminCategories() {
           <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "right", direction: "rtl" }}>
             <thead>
               <tr style={{ background: "#fafafa", color: "#888", fontSize: "0.9rem" }}>
+                <th style={{ padding: "1rem" }}>الصورة</th>
                 <th style={{ padding: "1rem" }}>اسم الفئة</th>
                 <th style={{ padding: "1rem" }}>تاريخ الإنشاء</th>
                 <th style={{ padding: "1rem", textAlign: "left" }}>الإجراءات</th>
@@ -88,6 +120,9 @@ export default function AdminCategories() {
             <tbody>
               {cats.map(c => (
                 <tr key={c.id} style={{ borderTop: "1px solid #eee" }}>
+                  <td style={{ padding: "1rem" }}>
+                     {c.imageUrl ? <img src={c.imageUrl} alt={c.name} style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 8 }} /> : "✨"}
+                  </td>
                   <td style={{ padding: "1rem", fontWeight: 700 }}>{c.name}</td>
                   <td style={{ padding: "1rem", color: "#888" }}>{new Date(c.createdAt).toLocaleDateString("ar-EG")}</td>
                   <td style={{ padding: "1rem", textAlign: "left" }}>
@@ -99,7 +134,7 @@ export default function AdminCategories() {
                 </tr>
               ))}
               {cats.length === 0 && (
-                <tr><td colSpan={3} style={{ padding: "3rem", textAlign: "center", color: "#ccc" }}>لا يوجد فئات مضافة</td></tr>
+                <tr><td colSpan={4} style={{ padding: "3rem", textAlign: "center", color: "#ccc" }}>لا يوجد فئات مضافة</td></tr>
               )}
             </tbody>
           </table>
@@ -121,6 +156,16 @@ export default function AdminCategories() {
                   autoFocus
                   style={{ width: "100%", padding: "0.75rem", border: "1px solid #ddd", borderRadius: "8px", fontFamily: "inherit" }}
                   placeholder="مثال: عطور صيفية"
+                />
+              </div>
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: 600 }}>رابط الصورة (اختياري)</label>
+                <input 
+                  type="url" 
+                  value={form.imageUrl} 
+                  onChange={e => setForm({ ...form, imageUrl: e.target.value })} 
+                  style={{ width: "100%", padding: "0.75rem", border: "1px solid #ddd", borderRadius: "8px", fontFamily: "inherit", textAlign: "left", direction: "ltr" }}
+                  placeholder="https://..."
                 />
               </div>
               <div style={{ display: "flex", gap: "1rem" }}>

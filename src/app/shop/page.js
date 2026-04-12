@@ -3,6 +3,15 @@ import { useState, useEffect } from "react";
 import ProductCard from "@/components/ui/ProductCard";
 import styles from "./page.module.css";
 
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => { setDebouncedValue(value); }, delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debouncedValue;
+}
+
 export default function Shop() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [products, setProducts] = useState([]);
@@ -11,9 +20,10 @@ export default function Shop() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // New Filters
+  // Filters
   const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState(""); // default (sortOrder) or 'low', 'high', 'new'
+  const debouncedSearch = useDebounce(search, 500);
+  const [sortOrder, setSortOrder] = useState("");
 
   useEffect(() => {
     fetch('/api/categories').then(res => res.json()).then(data => {
@@ -27,6 +37,8 @@ export default function Shop() {
       try {
         const urlOpts = new URLSearchParams();
         if (activeCategory !== 'all') urlOpts.append('category', activeCategory);
+        if (debouncedSearch) urlOpts.append('search', debouncedSearch);
+        if (sortOrder) urlOpts.append('sort', sortOrder);
         urlOpts.append('page', currentPage);
         urlOpts.append('limit', 20);
 
@@ -49,89 +61,95 @@ export default function Shop() {
       }
     }
     loadProducts();
-  }, [activeCategory, currentPage]);
+  }, [activeCategory, currentPage, debouncedSearch, sortOrder]);
 
   const handleCategoryChange = (catId) => {
     setActiveCategory(catId);
     setCurrentPage(1);
   }
 
-  // Client-side filtering & sorting for search & sort
-  let displayedProducts = [...products];
-  if (search) {
-    displayedProducts = displayedProducts.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
-  }
-  
-  if (sortOrder === 'low') {
-    displayedProducts.sort((a, b) => a.price - b.price);
-  } else if (sortOrder === 'high') {
-    displayedProducts.sort((a, b) => b.price - a.price);
-  } else if (sortOrder === 'new') {
-    displayedProducts.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-  } else {
-    // Default: Sort by the custom sortOrder defined by admin
-    displayedProducts.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  const handleSortChange = (val) => {
+    setSortOrder(val);
+    setCurrentPage(1);
   }
 
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>تسوق أحدث المنتجات</h1>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", marginBottom: "1.5rem", justifyContent: "space-between" }}>
-        <div className={styles.filters} style={{ margin: 0, flex: 2 }}>
-          <button
-            className={`${styles.filterBtn} ${activeCategory === "all" ? styles.active : ""}`}
-            onClick={() => handleCategoryChange("all")}
-          >
-            الكل
-          </button>
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              className={`${styles.filterBtn} ${activeCategory === cat.id ? styles.active : ""}`}
-              onClick={() => handleCategoryChange(cat.id)}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-        
-        <div style={{ display: "flex", gap: "0.5rem", flex: 1, minWidth: "300px" }}>
+      {/* شريط البحث والترتيب بمظهر احترافي */}
+      <div className={styles.searchSortContainer}>
+        <div className={styles.searchWrapper}>
+          <svg className={styles.searchIcon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
           <input 
             type="text" 
-            placeholder="ابحث عن منتج..."
+            placeholder="ابحث عن عطرك، ساعتك، أو ما ترغب به..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ flex: 2, padding: "0.6rem 1rem", border: "1px solid #e5e7eb", borderRadius: "8px", fontFamily: "inherit" }}
+            onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
+            className={styles.searchInput}
           />
+        </div>
+        
+        <div className={styles.sortWrapper}>
           <select 
             value={sortOrder} 
-            onChange={e => setSortOrder(e.target.value)}
-            style={{ flex: 1, padding: "0.6rem", border: "1px solid #e5e7eb", borderRadius: "8px", fontFamily: "inherit", background: "#fff" }}
+            onChange={e => handleSortChange(e.target.value)}
+            className={styles.sortSelect}
           >
-            <option value="">الترتيب الافتراضي</option>
-            <option value="new">الأحدث</option>
-            <option value="low">السعر: من الأقل</option>
-            <option value="high">السعر: من الأعلى</option>
+            <option value="">✨ الترتيب الافتراضي</option>
+            <option value="new">🆕 الأحدث</option>
+            <option value="price_asc">💎 السعر: من الأقل</option>
+            <option value="price_desc">👑 السعر: من الأعلى</option>
           </select>
         </div>
       </div>
 
+      {/* عرض الفئات بصور */}
+      <div className={styles.categoriesContainer}>
+        <button
+          className={`${styles.catCard} ${activeCategory === "all" ? styles.activeCat : ""}`}
+          onClick={() => handleCategoryChange("all")}
+        >
+          <div className={styles.catImageWrap}>🛍️</div>
+          <span className={styles.catName}>الكل</span>
+        </button>
+        {categories.map(cat => (
+          <button
+            key={cat.id}
+            className={`${styles.catCard} ${activeCategory === cat.id ? styles.activeCat : ""}`}
+            onClick={() => handleCategoryChange(cat.id)}
+          >
+            <div className={styles.catImageWrap}>
+              {cat.imageUrl ? (
+                 // eslint-disable-next-line @next/next/no-img-element
+                 <img src={cat.imageUrl} alt={cat.name} className={styles.catImg} />
+              ) : "✨"}
+            </div>
+            <span className={styles.catName}>{cat.name}</span>
+          </button>
+        ))}
+      </div>
+
       {loading ? (
-        <div style={{ textAlign: "center", padding: "4rem" }}>جاري تحميل المنتجات...</div>
+        <div className={styles.loadingState}>
+          <div className={styles.spinner}></div>
+          <p>جاري تحميل أروع المنتجات...</p>
+        </div>
       ) : (
         <div className={styles.grid}>
-          {displayedProducts.map(p => (
+          {products.map(p => (
             <ProductCard key={p.id} {...p} />
           ))}
         </div>
       )}
 
-      {!loading && displayedProducts.length === 0 && (
-        <div className={styles.empty}>لا توجد منتجات مطابقة لبحثك.</div>
+      {!loading && products.length === 0 && (
+        <div className={styles.empty}>لا توجد منتجات مطابقة لبحثك، جرب استخدام كلمات أخرى.</div>
       )}
 
-      {!loading && totalPages > 1 && !search && (
+      {!loading && totalPages > 1 && (
         <div className={styles.pagination}>
           <button
             disabled={currentPage === 1}

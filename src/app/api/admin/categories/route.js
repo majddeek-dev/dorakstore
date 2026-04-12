@@ -14,11 +14,11 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const { name } = await req.json();
+    const { name, imageUrl } = await req.json();
     if (!name) return NextResponse.json({ error: "Name required" }, { status: 400 });
     
     const cat = await prisma.category.create({
-      data: { name },
+      data: { name, imageUrl: imageUrl || null },
     });
     return NextResponse.json(cat);
   } catch (error) {

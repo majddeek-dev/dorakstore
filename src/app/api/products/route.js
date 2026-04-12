@@ -35,6 +35,14 @@ export async function GET(request) {
       }
     }
 
+    const searchQuery = searchParams.get('search');
+    if (searchQuery) {
+      if (!where.AND) where.AND = [];
+      where.AND.push({
+        name: { contains: searchQuery, mode: 'insensitive' }
+      });
+    }
+
     // تحديد الترتيب
     let orderBy = { sortOrder: 'asc' };
     if (sort === 'latest') orderBy = { createdAt: 'desc' };
