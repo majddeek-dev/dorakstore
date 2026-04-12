@@ -16,7 +16,7 @@ export async function POST(req) {
   try {
     const { name, imageUrl } = await req.json();
     if (!name) return NextResponse.json({ error: "Name required" }, { status: 400 });
-    
+
     const cat = await prisma.category.create({
       data: { name, imageUrl: imageUrl || null },
     });

@@ -16,7 +16,7 @@ export default function AdminCategories() {
       const res = await fetch("/api/admin/categories");
       const data = await res.json();
       setCats(Array.isArray(data) ? data : []);
-      
+
       const setRes = await fetch("/api/admin/settings");
       const setData = await setRes.json();
       if (setData.showHomeCategories !== undefined) {
@@ -81,7 +81,7 @@ export default function AdminCategories() {
       await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
       load();
       flash("🗑️ تم الحذف");
-    } catch {}
+    } catch { }
   }
 
   return (
@@ -92,8 +92,8 @@ export default function AdminCategories() {
           <p style={{ color: "#888" }}>إجمالي الفئات: {cats.length}</p>
         </div>
         <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <button 
-            onClick={toggleHomeCategories} 
+          <button
+            onClick={toggleHomeCategories}
             style={{ ...btnStyle(showHomeCategories ? "#dc2626" : "#10b981"), display: "flex", alignItems: "center", gap: "0.5rem" }}
           >
             {showHomeCategories ? "إخفاء الفئات من الرئيسية 👁️‍🗨️" : "إظهار الفئات في الرئيسية 👁️"}
@@ -121,7 +121,7 @@ export default function AdminCategories() {
               {cats.map(c => (
                 <tr key={c.id} style={{ borderTop: "1px solid #eee" }}>
                   <td style={{ padding: "1rem" }}>
-                     {c.imageUrl ? <img src={c.imageUrl} alt={c.name} style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 8 }} /> : "✨"}
+                    {c.imageUrl ? <img src={c.imageUrl} alt={c.name} style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 8 }} /> : "✨"}
                   </td>
                   <td style={{ padding: "1rem", fontWeight: 700 }}>{c.name}</td>
                   <td style={{ padding: "1rem", color: "#888" }}>{new Date(c.createdAt).toLocaleDateString("ar-EG")}</td>
@@ -148,11 +148,11 @@ export default function AdminCategories() {
             <form onSubmit={handleSave}>
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: 600 }}>اسم الفئة</label>
-                <input 
-                  type="text" 
-                  value={form.name} 
-                  onChange={e => setForm({ ...form, name: e.target.value })} 
-                  required 
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  required
                   autoFocus
                   style={{ width: "100%", padding: "0.75rem", border: "1px solid #ddd", borderRadius: "8px", fontFamily: "inherit" }}
                   placeholder="مثال: عطور صيفية"
@@ -160,10 +160,10 @@ export default function AdminCategories() {
               </div>
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: 600 }}>رابط الصورة (اختياري)</label>
-                <input 
-                  type="url" 
-                  value={form.imageUrl} 
-                  onChange={e => setForm({ ...form, imageUrl: e.target.value })} 
+                <input
+                  type="url"
+                  value={form.imageUrl}
+                  onChange={e => setForm({ ...form, imageUrl: e.target.value })}
                   style={{ width: "100%", padding: "0.75rem", border: "1px solid #ddd", borderRadius: "8px", fontFamily: "inherit", textAlign: "left", direction: "ltr" }}
                   placeholder="https://..."
                 />

@@ -81,17 +81,54 @@
   border-color: var(--accent);
 }
 
+.categoriesWrapper {
+  position: relative;
+  margin-bottom: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .categoriesContainer {
   display: flex;
   overflow-x: auto;
   gap: 1.5rem;
   padding: 1rem 0.5rem;
-  margin-bottom: 3rem;
   scrollbar-width: none; /* Firefox */
+  scroll-behavior: smooth;
+  flex: 1;
 }
 
 .categoriesContainer::-webkit-scrollbar {
   display: none;
+}
+
+.scrollBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gray-light);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.scrollBtn:hover {
+  background: var(--accent);
+  color: #111;
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+
+@media (max-width: 768px) {
+  .scrollBtn {
+    display: none; /* Hide arrows on small screens as swipe is natural */
+  }
 }
 
 .catCard {
