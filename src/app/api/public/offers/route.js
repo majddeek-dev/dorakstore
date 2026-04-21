@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const combos = await prisma.combo.findMany({
@@ -15,7 +17,8 @@ export async function GET() {
     const giftOffers = await prisma.giftOffer.findMany({
       where: { isActive: true },
       include: {
-        getProduct: true
+        getProduct: true,
+        getCategory: true
       }
     });
 
