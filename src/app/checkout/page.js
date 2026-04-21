@@ -65,7 +65,7 @@ export default function CheckoutPage() {
       region: formData.get("region"),
       address: formData.get("address"),
       total: grandTotal,
-      items: items.map(i => ({ id: i.id, qty: i.qty, price: i.effectivePrice !== undefined ? i.effectivePrice : i.price })),
+      items: items.map(i => ({ id: i.realProductId || i.id, qty: i.qty, price: i.effectivePrice !== undefined ? i.effectivePrice : i.price })),
     };
 
     try {

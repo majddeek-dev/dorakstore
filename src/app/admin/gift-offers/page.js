@@ -10,7 +10,7 @@ export default function AdminGiftOffers() {
   
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
-    buyProductId: "", buyCategoryId: "", minPrice: "", getProductId: "", isActive: true
+    buyProductId: "", buyCategoryId: "", minPrice: "", getProductId: "", getCategoryId: "", isActive: true
   });
 
   useEffect(() => { loadData(); }, []);
@@ -42,7 +42,8 @@ export default function AdminGiftOffers() {
       buyProductId: "", 
       buyCategoryId: "", 
       minPrice: "",
-      getProductId: products.length > 0 ? products[0].id : "", 
+      getProductId: "", 
+      getCategoryId: "",
       isActive: true 
     });
     setModal(true);
@@ -112,7 +113,10 @@ export default function AdminGiftOffers() {
                     {o.buyCategory ? `أي منتج من قسم (${o.buyCategory.name}) ` : ""}
                     {o.minPrice ? `بشرط السعر أكبر من ${o.minPrice} ₪` : ""}
                   </td>
-                  <td style={{ padding: "0.9rem 1.2rem", color: "#059669", fontWeight: 700 }}>🎁 {o.getProduct?.name}</td>
+                  <td style={{ padding: "0.9rem 1.2rem", color: "#059669", fontWeight: 700 }}>
+                    {o.getProduct ? `🎁 ${o.getProduct.name}` : ""}
+                    {o.getCategory ? `🎁 اختيار العميل من قسم (${o.getCategory.name})` : ""}
+                  </td>
                   <td style={{ padding: "0.9rem 1.2rem" }}>
                     <span style={{ 
                       background: o.isActive ? "#d1fae5" : "#fee2e2", 
@@ -171,11 +175,23 @@ export default function AdminGiftOffers() {
                 </div>
               </div>
               
-              <div>
-                <label style={lblStyle}>سيحصل مجاناً على *</label>
-                <select required value={form.getProductId} onChange={e => setForm({...form, getProductId: e.target.value})} style={inpStyle}>
-                  {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
+              <div style={{ background: "#f0fdf4", padding: "1rem", borderRadius: "8px", border: "1px solid #dcfce3" }}>
+                <p style={{ margin: "0 0 1rem 0", fontWeight: 700, fontSize: "0.95rem", color: "#166534" }}>الهدية التي سيحصل عليها العميل (اختر إحداها فقط):</p>
+                <div style={{ marginBottom: "1rem" }}>
+                  <label style={lblStyle}>إعطاء منتج محدد بشكل مباشر:</label>
+                  <select value={form.getProductId || ""} onChange={e => setForm({...form, getProductId: e.target.value, getCategoryId: ""})} style={inpStyle}>
+                    <option value="">-- اختياري: غير محدد --</option>
+                    {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={lblStyle}>أو السماح للعميل باختيار أي منتج من هذا القسم لمجاناً:</label>
+                  <select value={form.getCategoryId || ""} onChange={e => setForm({...form, getCategoryId: e.target.value, getProductId: ""})} style={inpStyle}>
+                    <option value="">-- اختياري: غير محدد --</option>
+                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
               </div>
 
               <div>

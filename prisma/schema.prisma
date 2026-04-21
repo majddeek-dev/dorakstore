@@ -68,6 +68,7 @@ model Category {
   createdAt DateTime  @default(now())
   products  Product[]
   giftOffers GiftOffer[] @relation("BuyCategoryGifts")
+  givenGiftOffers GiftOffer[] @relation("GetCategoryGifts")
 }
 
 model Admin {
@@ -162,8 +163,10 @@ model GiftOffer {
   buyProduct      Product?  @relation("BuyProduct", fields: [buyProductId], references: [id], onDelete: Cascade)
   buyCategory     Category? @relation("BuyCategoryGifts", fields: [buyCategoryId], references: [id], onDelete: Cascade)
   
-  getProductId    String
-  getProduct      Product   @relation("GetProduct", fields: [getProductId], references: [id], onDelete: Cascade)
+  getProductId    String?
+  getCategoryId   String?
+  getProduct      Product?  @relation("GetProduct", fields: [getProductId], references: [id], onDelete: Cascade)
+  getCategory     Category? @relation("GetCategoryGifts", fields: [getCategoryId], references: [id], onDelete: Cascade)
   
   isActive        Boolean   @default(true)
   createdAt       DateTime  @default(now())
