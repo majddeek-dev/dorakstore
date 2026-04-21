@@ -3,14 +3,14 @@ import Link from "next/link";
 import { useCart } from "@/lib/CartContext";
 import styles from "./ProductCard.module.css";
 
-export default function ProductCard({ id, name, price, oldPrice, imageUrl, badge, priceRules }) {
+export default function ProductCard({ id, name, price, oldPrice, imageUrl, badge, priceRules, categoryId }) {
   const { addItem, user, memberDiscountPercent } = useCart();
 
   const memberPrice = user ? price * (1 - memberDiscountPercent / 100) : null;
 
   function handleAdd(e) {
     e.preventDefault();
-    addItem({ id, name, price, imageUrl });
+    addItem({ id, name, price, imageUrl, categoryId });
   }
 
   // Find the best quantity rule if any exists
