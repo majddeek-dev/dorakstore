@@ -27,6 +27,27 @@
   z-index: 2;
 }
 
+.giftBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #16a34a;
+  color: #fff;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: 20px;
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
 .imageWrap {
   display: block;
   width: 100%;

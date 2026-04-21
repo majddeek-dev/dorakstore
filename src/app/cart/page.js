@@ -130,21 +130,28 @@ export default function CartPage() {
                 className={styles.modalClose}>
                 ✕
               </button>
-              <h2 className={styles.modalTitle}>اختر هديتك المجانية</h2>
-              <p className={styles.modalDesc}>يحق لك اختيار {activeGiftOffer.qtyRemaining} منتجات مجانياً من الأجهزة المتاحة لتضاف كهدية.</p>
+              
+              <div className={styles.modalHeader}>
+                 <span className={styles.modalIcon}>🎁</span>
+                 <h2 className={styles.modalTitle}>مبروك، اختر هديتك!</h2>
+                 <p className={styles.modalDesc}>
+                   يحق لك اختيار <strong>{activeGiftOffer.qtyRemaining}</strong> منتجات مجانية من هذا القسم.
+                 </p>
+              </div>
               
               {loadingGifts ? <p style={{textAlign:"center", padding:"3rem"}}>⏳ جاري تحميل الهدايا المتاحة...</p> : (
                  <div className={styles.giftGrid}>
                     {giftProducts.map(p => (
                        <div key={p.id} className={styles.giftCard}>
                           <div className={styles.giftCardImgWrap}>
+                             <span className={styles.giftBadgeMini}>هدية</span>
                             {p.imageUrl ? 
                               <img src={p.imageUrl} alt={p.name} className={styles.giftCardImg} /> : 
                               <span style={{fontSize: "2rem"}}>🛍️</span>}
                           </div>
                           <h4 className={styles.giftCardName}>{p.name}</h4>
                           <button onClick={() => handleSelectGift(p)} className={styles.giftCardBtn}>
-                            اختيار الهدية
+                            تأكيد الاختيار
                           </button>
                        </div>
                     ))}

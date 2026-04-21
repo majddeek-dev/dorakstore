@@ -225,7 +225,8 @@ export function CartProvider({ children }) {
   return (
     <CartContext.Provider value={{ 
       items, computedItems: finalItems, addItem, removeItem, updateQty, clearCart, chooseGift,
-      subtotal, memberDiscount, memberDiscountPercent, total, count, user, pendingGifts: pendingGiftsList
+      subtotal, memberDiscount, memberDiscountPercent, total, count, user, 
+      pendingGifts: pendingGiftsList, offers
     }}>
       {children}
     </CartContext.Provider>

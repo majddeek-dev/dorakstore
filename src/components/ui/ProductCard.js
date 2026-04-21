@@ -4,7 +4,7 @@ import { useCart } from "@/lib/CartContext";
 import styles from "./ProductCard.module.css";
 
 export default function ProductCard({ id, name, price, oldPrice, imageUrl, badge, priceRules, categoryId }) {
-  const { addItem, user, memberDiscountPercent } = useCart();
+  const { addItem, user, memberDiscountPercent, offers } = useCart();
 
   const memberPrice = user ? price * (1 - memberDiscountPercent / 100) : null;
 
@@ -13,12 +13,25 @@ export default function ProductCard({ id, name, price, oldPrice, imageUrl, badge
     addItem({ id, name, price, imageUrl, categoryId });
   }
 
+  // Check if this product triggers any gift offer
+  const hasGift = offers?.giftOffers?.some(go => {
+    if (!go.isActive) return false;
+    if (go.buyProductId) return go.buyProductId === id;
+    if (go.buyCategoryId) return go.buyCategoryId === categoryId && (go.minPrice ? price >= go.minPrice : true);
+    return false;
+  });
+
   // Find the best quantity rule if any exists
   const hasRules = priceRules && priceRules.length > 0;
   const bestRule = hasRules ? priceRules.reduce((prev, current) => (prev.discountPercent > current.discountPercent) ? prev : current) : null;
 
   return (
     <div className={styles.card}>
+      {hasGift && (
+        <div className={styles.giftBadge} title="هذا المنتج يمنحك هدية مجانية! 🎁">
+          🎁 هدية مجانية
+        </div>
+      )}
       {(badge || (user && memberDiscountPercent > 0)) && (
         <div className={styles.badge}>
           {badge || `خصم الأعضاء ${memberDiscountPercent}%`}
