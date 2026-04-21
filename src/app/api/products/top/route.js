@@ -37,9 +37,10 @@ export async function GET() {
       // 3. Fallback: Get the 4 newest products if no sales exist
       products = await prisma.product.findMany({
         take: 4,
-        orderBy: {
-          createdAt: 'desc'
-        }
+        orderBy: [
+          { sortOrder: 'asc' },
+          { createdAt: 'desc' }
+        ]
       });
     }
 

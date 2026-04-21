@@ -5,7 +5,7 @@ import { useCart } from "@/lib/CartContext";
 import styles from "./page.module.css";
 
 export default function CheckoutPage() {
-  const { items, subtotal, memberDiscount, memberDiscountPercent, total: cartTotal, user, clearCart } = useCart();
+  const { computedItems: items, subtotal, memberDiscount, memberDiscountPercent, total: cartTotal, user, clearCart } = useCart();
   const router = useRouter();
   const [couponCode, setCouponCode] = useState("");
   const [couponData, setCouponData] = useState(null);
@@ -65,7 +65,7 @@ export default function CheckoutPage() {
       region: formData.get("region"),
       address: formData.get("address"),
       total: grandTotal,
-      items: items.map(i => ({ id: i.id, qty: i.qty, price: i.price })),
+      items: items.map(i => ({ id: i.id, qty: i.qty, price: i.effectivePrice !== undefined ? i.effectivePrice : i.price })),
     };
 
     try {
@@ -128,7 +128,7 @@ export default function CheckoutPage() {
               <div key={i.id} className={styles.summaryItem}>
                 <span className={styles.summaryItemName}>{i.name}</span>
                 <span className={styles.summaryItemQty}>× {i.qty}</span>
-                <span className={styles.summaryItemPrice}>{(i.price * i.qty).toFixed(2)} ₪</span>
+                <span className={styles.summaryItemPrice}>{((i.effectivePrice !== undefined ? i.effectivePrice : i.price) * i.qty).toFixed(2)} ₪</span>
               </div>
             ))}
           </div>

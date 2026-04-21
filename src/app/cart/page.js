@@ -4,7 +4,7 @@ import { useCart } from "@/lib/CartContext";
 import styles from "./page.module.css";
 
 export default function CartPage() {
-  const { items, updateQty, removeItem, total } = useCart();
+  const { items, computedItems, updateQty, removeItem, total } = useCart();
 
   return (
     <div className={styles.container}>
@@ -19,8 +19,8 @@ export default function CartPage() {
       ) : (
         <div className={styles.layout}>
           <div className={styles.itemsList}>
-            {items.map(item => (
-              <div key={item.id} className={styles.item}>
+            {computedItems.map((item, index) => (
+              <div key={`${item.id}-${index}`} className={styles.item}>
                 <div className={styles.itemImg}>
                   {item.imageUrl
                     ? <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -29,16 +29,36 @@ export default function CartPage() {
                 </div>
                 <div className={styles.itemInfo}>
                   <Link href={`/product/${item.id}`} className={styles.itemName}>{item.name}</Link>
-                  <div className={styles.itemPrice}>{item.price} ₪</div>
-                  <div className={styles.itemTotal}>الإجمالي: {(item.price * item.qty).toFixed(2)} ₪</div>
+                  {item.discountReason && (
+                    <span style={{ background: "#d1fae5", color: "#065f46", fontSize:"0.75rem", padding:"2px 8px", borderRadius:"12px", display:"inline-block", marginTop:"4px" }}>
+                      {item.discountReason}
+                    </span>
+                  )}
+                  <div className={styles.itemPrice}>
+                    {item.effectivePrice < item.price ? (
+                      <>
+                        <span style={{ textDecoration: "line-through", color: "#999", fontSize: "0.85em", marginLeft: "8px" }}>{item.price} ₪</span>
+                        <span style={{ color: "#dc2626", fontWeight: "bold" }}>{item.effectivePrice} ₪</span>
+                      </>
+                    ) : (
+                      <span>{item.price} ₪</span>
+                    )}
+                  </div>
+                  <div className={styles.itemTotal}>الإجمالي: {(item.effectivePrice * item.qty).toFixed(2)} ₪</div>
                 </div>
                 <div className={styles.actions}>
-                  <div className={styles.qtyBox}>
-                    <button onClick={() => updateQty(item.id, -1)}>−</button>
-                    <span>{item.qty}</span>
-                    <button onClick={() => updateQty(item.id, 1)}>+</button>
-                  </div>
-                  <button onClick={() => removeItem(item.id)} className={styles.removeBtn}>🗑 حذف</button>
+                  {!item.isGift ? (
+                    <>
+                      <div className={styles.qtyBox}>
+                        <button onClick={() => updateQty(item.id, -1)}>−</button>
+                        <span>{item.qty}</span>
+                        <button onClick={() => updateQty(item.id, 1)}>+</button>
+                      </div>
+                      <button onClick={() => removeItem(item.id)} className={styles.removeBtn}>🗑 حذف</button>
+                    </>
+                  ) : (
+                    <div style={{ color: "#059669", fontWeight: "bold", padding: "0.5rem" }}>هدية مجانية 🎁</div>
+                  )}
                 </div>
               </div>
             ))}

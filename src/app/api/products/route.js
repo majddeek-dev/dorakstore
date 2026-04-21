@@ -7,7 +7,7 @@ export async function GET(request) {
     const category = searchParams.get('category');
     const page = searchParams.get('page');
     const limit = searchParams.get('limit') || 20;
-    const sort = searchParams.get('sort') || 'latest';
+    const sort = searchParams.get('sort') || 'default';
     const admin = searchParams.get('admin') === 'true'; // إذا كان الطلب من الأدمن لا نطبق الفلاتر
 
     const where = {};
@@ -45,7 +45,7 @@ export async function GET(request) {
 
     // تحديد الترتيب
     let orderBy = { sortOrder: 'asc' };
-    if (sort === 'latest') orderBy = { createdAt: 'desc' };
+    if (sort === 'latest' || sort === 'new') orderBy = { createdAt: 'desc' };
     else if (sort === 'price_asc') orderBy = { price: 'asc' };
     else if (sort === 'price_desc') orderBy = { price: 'desc' };
 

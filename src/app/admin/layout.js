@@ -41,7 +41,11 @@ export default function AdminLayout({ children }) {
           <Link href="/admin/customers" className={pathname.startsWith('/admin/customers') ? styles.active : ''}>العملاء</Link>
           <Link href="/admin/discounts" className={pathname.startsWith('/admin/discounts') ? styles.active : ''}>خصومات</Link>
           <Link href="/admin/categories" className={pathname.startsWith('/admin/categories') ? styles.active : ''}>الفئات</Link>
-          <Link href="/admin/combos" className={pathname.startsWith('/admin/combos') ? styles.active : ''}>الكومبو</Link>
+          <div style={{ padding: "0.5rem 1rem", fontSize: "0.8rem", color: "#999", fontWeight: "bold", marginTop: "0.5rem" }}>العروض والخصومات</div>
+          <Link href="/admin/combos" className={pathname.startsWith('/admin/combos') ? styles.active : ''}>عروض الكومبو</Link>
+          <Link href="/admin/gift-offers" className={pathname.startsWith('/admin/gift-offers') ? styles.active : ''}>هدايا المنتجات</Link>
+          <Link href="/admin/price-rules" className={pathname.startsWith('/admin/price-rules') ? styles.active : ''}>خصم الكميات</Link>
+          <div style={{ borderBottom: "1px solid #e5e7eb", margin: "0.5rem 1rem" }}></div>
           <Link href="/admin/accounting" className={pathname.startsWith('/admin/accounting') ? styles.active : ''}>حسابات</Link>
           <Link href="/" className={`${styles.storeLink} ${pathname === '/' ? styles.active : ''}`}>العودة للمتجر</Link>
         </nav>

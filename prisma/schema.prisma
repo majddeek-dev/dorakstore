@@ -30,6 +30,8 @@ model Product {
   orderItems  OrderItem[]
   comboItems  ComboItem[]
   priceRules  PriceRule[]
+  buyGiftOffers GiftOffer[] @relation("BuyProduct")
+  getGiftOffers GiftOffer[] @relation("GetProduct")
 }
 
 model Order {
@@ -147,5 +149,17 @@ model PriceRule {
   price     Float
   label     String?
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// نظام الهدايا - اشتر منتج واحصل على آخر هدية
+model GiftOffer {
+  id              String   @id @default(cuid())
+  buyProductId    String
+  getProductId    String
+  buyProduct      Product  @relation("BuyProduct", fields: [buyProductId], references: [id], onDelete: Cascade)
+  getProduct      Product  @relation("GetProduct", fields: [getProductId], references: [id], onDelete: Cascade)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
