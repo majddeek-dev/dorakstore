@@ -67,6 +67,7 @@ model Category {
   imageUrl  String?
   createdAt DateTime  @default(now())
   products  Product[]
+  giftOffers GiftOffer[] @relation("BuyCategoryGifts")
 }
 
 model Admin {
@@ -154,12 +155,18 @@ model PriceRule {
 // نظام الهدايا - اشتر منتج واحصل على آخر هدية
 model GiftOffer {
   id              String   @id @default(cuid())
-  buyProductId    String
+  buyProductId    String?
+  buyCategoryId   String?
+  minPrice        Float?
+  
+  buyProduct      Product?  @relation("BuyProduct", fields: [buyProductId], references: [id], onDelete: Cascade)
+  buyCategory     Category? @relation("BuyCategoryGifts", fields: [buyCategoryId], references: [id], onDelete: Cascade)
+  
   getProductId    String
-  buyProduct      Product  @relation("BuyProduct", fields: [buyProductId], references: [id], onDelete: Cascade)
-  getProduct      Product  @relation("GetProduct", fields: [getProductId], references: [id], onDelete: Cascade)
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  getProduct      Product   @relation("GetProduct", fields: [getProductId], references: [id], onDelete: Cascade)
+  
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 

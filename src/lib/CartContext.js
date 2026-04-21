@@ -49,7 +49,7 @@ export function CartProvider({ children }) {
       }
       return [
         ...prev,
-        { id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl || null, qty: 1 }
+        { id: product.id, name: product.name, categoryId: product.categoryId || null, price: product.price, imageUrl: product.imageUrl || null, qty: 1 }
       ];
     });
   }
@@ -111,10 +111,31 @@ export function CartProvider({ children }) {
   const finalItems = [...computedItems];
   if (offers.giftOffers) {
     offers.giftOffers.forEach(go => {
-      const buyItem = computedItems.find(i => i.id === go.buyProductId);
-      if (buyItem) {
-        // Automatically add the gift item
-        // Only add as many gifts as the product bought
+      // Find all items that satisfy the offer
+      const matchingItems = computedItems.filter(i => {
+        let matches = false;
+        
+        if (go.buyProductId) {
+          matches = (i.id === go.buyProductId);
+        } else {
+          // If no specific product, check category and/or price
+          let catMatch = go.buyCategoryId ? (i.categoryId === go.buyCategoryId) : true;
+          let priceMatch = go.minPrice ? (i.price >= go.minPrice) : true;
+          
+          if (!go.buyCategoryId && !go.minPrice) {
+            matches = false; // Invalid offer condition
+          } else {
+            matches = catMatch && priceMatch;
+          }
+        }
+        
+        return matches && !i.isGift; // Prevent gifts from triggering more gifts
+      });
+
+      if (matchingItems.length > 0) {
+        // Add the gift item
+        const totalQty = matchingItems.reduce((sum, item) => sum + item.qty, 0);
+        
         const existingGift = finalItems.find(i => i.id === go.getProductId && i.isGift);
         if (!existingGift && go.getProduct) {
           finalItems.push({
@@ -123,7 +144,7 @@ export function CartProvider({ children }) {
             price: go.getProduct.price,
             effectivePrice: 0,
             imageUrl: go.getProduct.imageUrl || null,
-            qty: buyItem.qty,
+            qty: totalQty,
             isGift: true,
             discountReason: 'هدية مجانية'
           });

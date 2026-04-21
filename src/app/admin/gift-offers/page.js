@@ -8,8 +8,9 @@ export default function AdminGiftOffers() {
   const [modal, setModal] = useState(false);
   const [saving, setSaving] = useState(false);
   
+  const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
-    buyProductId: "", getProductId: "", isActive: true
+    buyProductId: "", buyCategoryId: "", minPrice: "", getProductId: "", isActive: true
   });
 
   useEffect(() => { loadData(); }, []);
@@ -17,15 +18,18 @@ export default function AdminGiftOffers() {
   async function loadData() {
     setLoading(true);
     try {
-      const [oRes, pRes] = await Promise.all([
+      const [oRes, pRes, cRes] = await Promise.all([
         fetch("/api/admin/gift-offers"),
-        fetch("/api/products?admin=true")
+        fetch("/api/products?admin=true"),
+        fetch("/api/categories")
       ]);
       const oData = await oRes.json();
       const pData = await pRes.json();
+      const cData = await cRes.json();
       
       setOffers(Array.isArray(oData) ? oData : []);
       setProducts(Array.isArray(pData) ? pData : []);
+      setCategories(Array.isArray(cData) ? cData : []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -35,7 +39,9 @@ export default function AdminGiftOffers() {
 
   function openAdd() {
     setForm({ 
-      buyProductId: products.length > 0 ? products[0].id : "", 
+      buyProductId: "", 
+      buyCategoryId: "", 
+      minPrice: "",
       getProductId: products.length > 0 ? products[0].id : "", 
       isActive: true 
     });
@@ -101,7 +107,11 @@ export default function AdminGiftOffers() {
             <tbody>
               {offers.map(o => (
                 <tr key={o.id} style={{ borderTop: "1px solid #f0f0f0" }}>
-                  <td style={{ padding: "0.9rem 1.2rem", fontWeight: 700 }}>{o.buyProduct?.name}</td>
+                  <td style={{ padding: "0.9rem 1.2rem", fontWeight: 700 }}>
+                    {o.buyProduct ? o.buyProduct.name : ""}
+                    {o.buyCategory ? `أي منتج من قسم (${o.buyCategory.name}) ` : ""}
+                    {o.minPrice ? `بشرط السعر أكبر من ${o.minPrice} ₪` : ""}
+                  </td>
                   <td style={{ padding: "0.9rem 1.2rem", color: "#059669", fontWeight: 700 }}>🎁 {o.getProduct?.name}</td>
                   <td style={{ padding: "0.9rem 1.2rem" }}>
                     <span style={{ 
@@ -137,11 +147,28 @@ export default function AdminGiftOffers() {
             </div>
             
             <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div>
-                <label style={lblStyle}>إذا اشترى الزبون المنتج *</label>
-                <select required value={form.buyProductId} onChange={e => setForm({...form, buyProductId: e.target.value})} style={inpStyle}>
-                  {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
+              <div style={{ background: "#f9fafb", padding: "1rem", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
+                <p style={{ margin: "0 0 1rem 0", fontWeight: 700, fontSize: "0.95rem", color: "#374151" }}>شروط الحصول على الهدية (اختر واحدة أو ادمج بينها):</p>
+                <div style={{ marginBottom: "1rem" }}>
+                  <label style={lblStyle}>إذا اشترى الزبون المنتج حصراً والتزم به:</label>
+                  <select value={form.buyProductId || ""} onChange={e => setForm({...form, buyProductId: e.target.value})} style={inpStyle}>
+                    <option value="">-- اختياري: غير محدد --</option>
+                    {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </div>
+                
+                <div style={{ marginBottom: "1rem" }}>
+                  <label style={lblStyle}>أو إذا اشترى أي منتج من هذا القسم / الفئة:</label>
+                  <select value={form.buyCategoryId || ""} onChange={e => setForm({...form, buyCategoryId: e.target.value})} style={inpStyle}>
+                    <option value="">-- اختياري: كل الأقسام --</option>
+                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={lblStyle}>بشرط أن يتجاوز سعر المنتج (₪):</label>
+                  <input type="number" placeholder="مثال: 100" value={form.minPrice || ""} onChange={e => setForm({...form, minPrice: e.target.value})} style={inpStyle} />
+                </div>
               </div>
               
               <div>

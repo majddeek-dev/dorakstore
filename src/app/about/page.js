@@ -5,8 +5,8 @@ export default function AboutPage() {
   return (
     <div style={{ direction: 'rtl', fontFamily: "'Tajawal', sans-serif" }}>
       {/* Hero Section */}
-      <section style={{ 
-        padding: '6rem 2rem', 
+      <section style={{
+        padding: '6rem 2rem',
         background: 'linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("https://images.unsplash.com/photo-1594132225292-a13ea2186985?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -25,16 +25,16 @@ export default function AboutPage() {
           <div>
             <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '1.5rem', color: '#111' }}>رؤيتنا</h2>
             <p style={{ color: '#555', lineHeight: 1.8, fontSize: '1.1rem' }}>
-              بدأ DK7 Store كحلم بسيط في قلب فلسطين، لتمكين الشباب من الحصول على منتجات عالمية بجودة عالية وأسعار منافسة. نحن نؤمن أن الأناقة ليست مجرد مظهر، بل هي تعبير عن الهوية والكبرياء.
+              بدأ Dorak Store كحلم بسيط في قلب فلسطين، لتمكين الشباب من الحصول على منتجات عالمية بجودة عالية وأسعار منافسة. نحن نؤمن أن الأناقة ليست مجرد مظهر، بل هي تعبير عن الهوية والكبرياء.
             </p>
             <p style={{ color: '#555', lineHeight: 1.8, fontSize: '1.1rem', marginTop: '1rem' }}>
               كل منتج في متجرنا يتم اختياره بعناية فائقة لنضمن لك تجربة تسوق استثنائية، بدءاً من جودة الخامة وصولاً إلى سرعة التوصيل لباب بيتك.
             </p>
           </div>
-          <div style={{ 
-            background: '#fafafa', 
-            padding: '3rem', 
-            borderRadius: '30px', 
+          <div style={{
+            background: '#fafafa',
+            padding: '3rem',
+            borderRadius: '30px',
             border: '2px dashed #eee',
             textAlign: 'center'
           }}>
@@ -68,13 +68,13 @@ export default function AboutPage() {
       {/* CTA */}
       <section style={{ padding: '6rem 2rem', textAlign: 'center' }}>
         <h2 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1.5rem' }}>جاهز لتعزيز أناقتك؟</h2>
-        <Link href="/shop" style={{ 
-          display: 'inline-block', 
-          padding: '1.2rem 3.5rem', 
-          background: '#111', 
-          color: '#fff', 
-          borderRadius: '50px', 
-          fontWeight: 800, 
+        <Link href="/shop" style={{
+          display: 'inline-block',
+          padding: '1.2rem 3.5rem',
+          background: '#111',
+          color: '#fff',
+          borderRadius: '50px',
+          fontWeight: 800,
           fontSize: '1.2rem',
           boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
         }}>
