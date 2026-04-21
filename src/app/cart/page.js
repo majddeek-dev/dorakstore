@@ -42,12 +42,12 @@ export default function CartPage() {
           <div className={styles.itemsList}>
             {/* Pending Gifts Alert */}
             {pendingGifts && pendingGifts.length > 0 && (
-              <div style={{ background: "#f0fdf4", border: "1px solid #16a34a", padding: "1rem", borderRadius: "8px", marginBottom: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                   <span style={{ fontSize: "1.8rem", marginLeft: "10px" }}>🎁</span>
-                   <span style={{ fontWeight: 700, color: "#166534" }}>مبروك! لك {pendingGifts.reduce((s, pg) => s + pg.qtyRemaining, 0)} هدايا مجانية بانتظار اختيارك.</span>
+              <div className={styles.giftAlert}>
+                <div className={styles.giftAlertTitle}>
+                   <span className={styles.giftAlertEmoji}>🎁</span>
+                   <span>مبروك! لك {pendingGifts.reduce((s, pg) => s + pg.qtyRemaining, 0)} هدايا مجانية بانتظار اختيارك.</span>
                 </div>
-                <button onClick={() => openGiftSelector(pendingGifts[0])} style={{ background: "#16a34a", color: "#fff", border: "none", padding: "0.6rem 1.2rem", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", fontSize: "0.95rem" }}>
+                <button onClick={() => openGiftSelector(pendingGifts[0])} className={styles.giftAlertBtn}>
                    اختيار الهدية الآن
                 </button>
               </div>
@@ -123,31 +123,33 @@ export default function CartPage() {
 
       {/* Gift Modal */}
       {activeGiftOffer && (
-        <div style={{position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem"}}>
-           <div style={{background: "#fff", padding: "2rem", borderRadius: "12px", width: "100%", maxWidth: "600px", maxHeight: "85vh", overflowY: "auto", position: "relative"}}>
+        <div className={styles.modalOverlay}>
+           <div className={styles.modalContent}>
               <button 
                 onClick={() => setActiveGiftOffer(null)} 
-                style={{position: "absolute", top: "1rem", left: "1rem", border: "none", background: "#f3f4f6", padding: "5px 10px", borderRadius: "6px", fontSize: "1.2rem", cursor: "pointer"}}>
+                className={styles.modalClose}>
                 ✕
               </button>
-              <h2 style={{color: "#166534", marginBottom: "1rem"}}>اختر هديتك المجانية</h2>
-              <p style={{marginBottom: "1.5rem", color: "#666", fontSize:"0.95rem"}}>يحق لك اختيار {activeGiftOffer.qtyRemaining} منتجات مجانياً من الأجهزة المتاحة لتضاف كهدية.</p>
+              <h2 className={styles.modalTitle}>اختر هديتك المجانية</h2>
+              <p className={styles.modalDesc}>يحق لك اختيار {activeGiftOffer.qtyRemaining} منتجات مجانياً من الأجهزة المتاحة لتضاف كهدية.</p>
               
-              {loadingGifts ? <p style={{textAlign:"center", padding:"2rem"}}>⏳ جاري تحميل الهدايا المتاحة...</p> : (
-                 <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "1rem"}}>
+              {loadingGifts ? <p style={{textAlign:"center", padding:"3rem"}}>⏳ جاري تحميل الهدايا المتاحة...</p> : (
+                 <div className={styles.giftGrid}>
                     {giftProducts.map(p => (
-                       <div key={p.id} style={{border: "1px solid #e5e7eb", padding: "0.75rem", borderRadius: "8px", textAlign: "center", display:"flex", flexDirection:"column", justifyContent:"space-between"}}>
-                          {p.imageUrl ? 
-                            <img src={p.imageUrl} alt={p.name} style={{width: "100%", height: "120px", objectFit: "cover", borderRadius: "6px"}} /> : 
-                            <div style={{height: "120px", background: "#f5f5f5", borderRadius:"6px", display:"flex", alignItems:"center", justifyContent:"center"}}>🛍️</div>}
-                          <h4 style={{margin: "0.5rem 0", fontSize:"0.9rem"}}>{p.name}</h4>
-                          <button onClick={() => handleSelectGift(p)} style={{background: "#16a34a", color: "#fff", border: "none", padding: "0.5rem", borderRadius: "6px", cursor: "pointer", width: "100%", fontSize:"0.85rem", fontWeight:"bold"}}>
-                            اختيار
+                       <div key={p.id} className={styles.giftCard}>
+                          <div className={styles.giftCardImgWrap}>
+                            {p.imageUrl ? 
+                              <img src={p.imageUrl} alt={p.name} className={styles.giftCardImg} /> : 
+                              <span style={{fontSize: "2rem"}}>🛍️</span>}
+                          </div>
+                          <h4 className={styles.giftCardName}>{p.name}</h4>
+                          <button onClick={() => handleSelectGift(p)} className={styles.giftCardBtn}>
+                            اختيار الهدية
                           </button>
                        </div>
                     ))}
                     {giftProducts.length === 0 && (
-                      <p style={{gridColumn:"1/-1", textAlign:"center", padding:"2rem"}}>لا توجد منتجات متاحة حالياً.</p>
+                      <p style={{gridColumn:"1/-1", textAlign:"center", padding:"3rem", color: "#999"}}>لا توجد منتجات متاحة حالياً في هذا القسم.</p>
                     )}
                  </div>
               )}
