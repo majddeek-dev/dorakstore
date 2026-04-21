@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function PUT(request, { params }) {
+export async function PUT(request, props) {
   try {
+    const params = await props.params;
     const { id } = params;
     const body = await request.json();
     const { buyProductId, buyCategoryId, minPrice, getProductId, getCategoryId, isActive } = body;
@@ -24,8 +25,9 @@ export async function PUT(request, { params }) {
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request, props) {
   try {
+    const params = await props.params;
     const { id } = params;
     await prisma.giftOffer.delete({ where: { id } });
     return NextResponse.json({ success: true });
