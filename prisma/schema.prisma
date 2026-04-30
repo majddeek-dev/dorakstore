@@ -157,16 +157,14 @@ model PriceRule {
 model GiftOffer {
   id              String   @id @default(cuid())
   buyProductId    String?
-  buyCategoryId   String?
   minPrice        Float?
   
   buyProduct      Product?  @relation("BuyProduct", fields: [buyProductId], references: [id], onDelete: Cascade)
-  buyCategory     Category? @relation("BuyCategoryGifts", fields: [buyCategoryId], references: [id], onDelete: Cascade)
+  buyCategories   Category[] @relation("BuyCategoryGifts")
   
   getProductId    String?
-  getCategoryId   String?
   getProduct      Product?  @relation("GetProduct", fields: [getProductId], references: [id], onDelete: Cascade)
-  getCategory     Category? @relation("GetCategoryGifts", fields: [getCategoryId], references: [id], onDelete: Cascade)
+  getCategories   Category[] @relation("GetCategoryGifts")
   
   isActive        Boolean   @default(true)
   createdAt       DateTime  @default(now())

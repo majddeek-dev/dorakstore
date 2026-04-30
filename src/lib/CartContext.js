@@ -9,6 +9,7 @@ export function CartProvider({ children }) {
   const [memberDiscountPercent, setMemberDiscountPercent] = useState(0);
   const [offers, setOffers] = useState({ combos: [], priceRules: [], giftOffers: [] });
   const [mounted, setMounted] = useState(false);
+  const [offersLoaded, setOffersLoaded] = useState(false);
 
   // Load cart and session on mount
   useEffect(() => {
@@ -28,8 +29,14 @@ export function CartProvider({ children }) {
     ]).then(([userData, settings, offersData]) => {
       if (userData.authenticated) setUser(userData.user);
       if (settings.member_discount_percent) setMemberDiscountPercent(parseFloat(settings.member_discount_percent));
-      if (offersData) setOffers(offersData);
-    }).catch(err => console.error("Failed to load session/settings/offers", err));
+      if (offersData) {
+        setOffers(offersData);
+        setOffersLoaded(true);
+      }
+    }).catch(err => {
+      console.error("Failed to load session/settings/offers", err);
+      setOffersLoaded(true); // Still mark as loaded to allow pruning if API failed/empty
+    });
   }, []);
 
   // Persist to localStorage whenever items change
@@ -39,17 +46,69 @@ export function CartProvider({ children }) {
     }
   }, [items, mounted]);
 
-  function addItem(product) {
+  // Helper to check if a gift offer's conditions are met by the current items
+  const checkGiftCondition = (offer, currentItems) => {
+    const matchingItems = currentItems.filter(i => {
+      if (i.isGift) return false;
+      let matches = false;
+      if (offer.buyProductId) {
+        matches = (i.id === offer.buyProductId);
+      } else {
+        const hasCategories = offer.buyCategories && offer.buyCategories.length > 0;
+        let catMatch = hasCategories ? offer.buyCategories.some(c => c.id === i.categoryId) : true;
+        let priceMatch = offer.minPrice ? (i.price >= offer.minPrice) : true;
+        
+        if (!hasCategories && !offer.minPrice) {
+          matches = false;
+        } else {
+          matches = catMatch && priceMatch;
+        }
+      }
+      return matches;
+    });
+    return matchingItems.length > 0;
+  };
+
+  // Cleanup invalid gifts permanently from items state
+  useEffect(() => {
+    if (!mounted || !offersLoaded) return;
+
+    setItems(prev => {
+      let changed = false;
+      const next = prev.filter(item => {
+        if (!item.isGift) return true;
+
+        // 1. Check if offer still exists and is active
+        const offer = offers.giftOffers.find(go => go.id === item.giftOfferId);
+        if (!offer) {
+          changed = true;
+          return false;
+        }
+
+        // 2. Check if the "main product" condition is still met
+        if (!checkGiftCondition(offer, prev)) {
+          changed = true;
+          return false;
+        }
+
+        return true;
+      });
+
+      return changed ? next : prev;
+    });
+  }, [offers.giftOffers, offersLoaded, mounted]);
+
+  function addItem(product, quantityToAdd = 1) {
     setItems(prev => {
       const existing = prev.find(i => i.id === product.id);
       if (existing) {
         return prev.map(i =>
-          i.id === product.id ? { ...i, qty: i.qty + 1 } : i
+          i.id === product.id ? { ...i, qty: i.qty + quantityToAdd } : i
         );
       }
       return [
         ...prev,
-        { id: product.id, name: product.name, categoryId: product.categoryId || null, price: product.price, imageUrl: product.imageUrl || null, qty: 1 }
+        { id: product.id, name: product.name, categoryId: product.categoryId || null, price: product.price, imageUrl: product.imageUrl || null, qty: quantityToAdd }
       ];
     });
   }
@@ -93,27 +152,34 @@ export function CartProvider({ children }) {
   }
 
   // Calculate computed items with applied rules
-  const computedItems = items.map(item => {
-    let effectivePrice = item.price;
-    let appliedRule = null;
-    let discountReason = null;
+  const computedItems = items
+    .filter(item => {
+      if (!item.isGift) return true;
+      const offer = offers.giftOffers?.find(go => go.id === item.giftOfferId);
+      if (!offer) return false;
+      return checkGiftCondition(offer, items);
+    })
+    .map(item => {
+      let effectivePrice = item.price;
+      let appliedRule = null;
+      let discountReason = null;
 
-    if (item.isGift) {
-       return { ...item, effectivePrice: 0, appliedRule: 'giftChoice', discountReason: 'هدية مجانية (اختيارك)' };
-    }
-
-    // 1. Check Price Rules (Volume Discount)
-    if (offers.priceRules) {
-      const rule = offers.priceRules.find(r => r.productId === item.id && item.qty >= r.minQty);
-      if (rule) {
-        effectivePrice = rule.price;
-        appliedRule = 'priceRule';
-        discountReason = rule.label || `خصم الكمية`;
+      if (item.isGift) {
+        return { ...item, effectivePrice: 0, appliedRule: 'giftChoice', discountReason: 'هدية مجانية (اختيارك)' };
       }
-    }
 
-    return { ...item, effectivePrice, appliedRule, discountReason };
-  });
+      // 1. Check Price Rules (Volume Discount)
+      if (offers.priceRules) {
+        const rule = offers.priceRules.find(r => r.productId === item.id && item.qty >= r.minQty);
+        if (rule) {
+          effectivePrice = rule.price;
+          appliedRule = 'priceRule';
+          discountReason = rule.label || `خصم الكمية`;
+        }
+      }
+
+      return { ...item, effectivePrice, appliedRule, discountReason };
+    });
 
   // 2. Check Combos
   if (offers.combos) {
@@ -143,22 +209,7 @@ export function CartProvider({ children }) {
       // Find all items that satisfy the offer
       const matchingItems = finalItems.filter(i => {
         if (i.isGift) return false; // Prevent gifts from triggering more gifts
-        let matches = false;
-        
-        if (go.buyProductId) {
-          matches = (i.id === go.buyProductId);
-        } else {
-          // If no specific product, check category and/or price
-          let catMatch = go.buyCategoryId ? (i.categoryId === go.buyCategoryId) : true;
-          let priceMatch = go.minPrice ? (i.price >= go.minPrice) : true;
-          
-          if (!go.buyCategoryId && !go.minPrice) {
-            matches = false; // Invalid offer condition
-          } else {
-            matches = catMatch && priceMatch;
-          }
-        }
-        return matches;
+        return checkGiftCondition(go, finalItems); // Use helper for consistency
       });
 
       if (matchingItems.length > 0) {
@@ -182,7 +233,7 @@ export function CartProvider({ children }) {
            } else {
              existingGift.qty = totalQty; // sync qty
            }
-        } else if (go.getCategoryId) {
+        } else if (go.getCategories && go.getCategories.length > 0) {
            const chosenGiftsForOffer = finalItems.filter(i => i.isGift && i.giftOfferId === go.id);
            const chosenQty = chosenGiftsForOffer.reduce((sum, item) => sum + item.qty, 0);
 

@@ -6,16 +6,16 @@ export async function PUT(request, props) {
     const params = await props.params;
     const { id } = params;
     const body = await request.json();
-    const { buyProductId, buyCategoryId, minPrice, getProductId, getCategoryId, isActive } = body;
+    const { buyProductId, buyCategoryIds, minPrice, getProductId, getCategoryIds, isActive } = body;
 
     const offer = await prisma.giftOffer.update({
       where: { id },
       data: { 
         buyProductId: buyProductId || null, 
-        buyCategoryId: buyCategoryId || null, 
+        buyCategories: { set: buyCategoryIds?.length ? buyCategoryIds.map(id => ({ id })) : [] },
         minPrice: minPrice ? parseFloat(minPrice) : null, 
         getProductId: getProductId || null, 
-        getCategoryId: getCategoryId || null,
+        getCategories: { set: getCategoryIds?.length ? getCategoryIds.map(id => ({ id })) : [] },
         isActive 
       },
     });

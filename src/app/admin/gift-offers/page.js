@@ -10,7 +10,7 @@ export default function AdminGiftOffers() {
   
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
-    buyProductId: "", buyCategoryId: "", minPrice: "", getProductId: "", getCategoryId: "", isActive: true
+    buyProductId: "", buyCategoryIds: [], minPrice: "", getProductId: "", getCategoryIds: [], isActive: true
   });
 
   useEffect(() => { loadData(); }, []);
@@ -40,10 +40,10 @@ export default function AdminGiftOffers() {
   function openAdd() {
     setForm({ 
       buyProductId: "", 
-      buyCategoryId: "", 
+      buyCategoryIds: [], 
       minPrice: "",
       getProductId: "", 
-      getCategoryId: "",
+      getCategoryIds: [],
       isActive: true 
     });
     setModal(true);
@@ -110,12 +110,12 @@ export default function AdminGiftOffers() {
                 <tr key={o.id} style={{ borderTop: "1px solid #f0f0f0" }}>
                   <td style={{ padding: "0.9rem 1.2rem", fontWeight: 700 }}>
                     {o.buyProduct ? o.buyProduct.name : ""}
-                    {o.buyCategory ? `أي منتج من قسم (${o.buyCategory.name}) ` : ""}
+                    {o.buyCategories && o.buyCategories.length > 0 ? `أي منتج من قسم (${o.buyCategories.map(c => c.name).join('، ')}) ` : ""}
                     {o.minPrice ? `بشرط السعر أكبر من ${o.minPrice} ₪` : ""}
                   </td>
                   <td style={{ padding: "0.9rem 1.2rem", color: "#059669", fontWeight: 700 }}>
                     {o.getProduct ? `🎁 ${o.getProduct.name}` : ""}
-                    {o.getCategory ? `🎁 اختيار العميل من قسم (${o.getCategory.name})` : ""}
+                    {o.getCategories && o.getCategories.length > 0 ? `🎁 اختيار العميل من قسم (${o.getCategories.map(c => c.name).join('، ')})` : ""}
                   </td>
                   <td style={{ padding: "0.9rem 1.2rem" }}>
                     <span style={{ 
@@ -128,7 +128,14 @@ export default function AdminGiftOffers() {
                   </td>
                   <td style={{ padding: "0.9rem 1.2rem" }}>
                     <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <button onClick={() => { setForm(o); setModal(true); }} style={btnSmall("#6366f1")}>تعديل</button>
+                      <button onClick={() => { 
+                        setForm({
+                          ...o,
+                          buyCategoryIds: o.buyCategories ? o.buyCategories.map(c => c.id) : [],
+                          getCategoryIds: o.getCategories ? o.getCategories.map(c => c.id) : []
+                        }); 
+                        setModal(true); 
+                      }} style={btnSmall("#6366f1")}>تعديل</button>
                       <button onClick={() => handleDelete(o.id)} style={btnSmall("#dc2626")}>حذف</button>
                     </div>
                   </td>
@@ -162,11 +169,20 @@ export default function AdminGiftOffers() {
                 </div>
                 
                 <div style={{ marginBottom: "1rem" }}>
-                  <label style={lblStyle}>أو إذا اشترى أي منتج من هذا القسم / الفئة:</label>
-                  <select value={form.buyCategoryId || ""} onChange={e => setForm({...form, buyCategoryId: e.target.value})} style={inpStyle}>
-                    <option value="">-- اختياري: كل الأقسام --</option>
+                  <label style={lblStyle}>أو إذا اشترى أي منتج من هذا القسم / الفئة (يمكن تحديد أكثر من قسم):</label>
+                  <select 
+                    multiple
+                    value={form.buyCategoryIds} 
+                    onChange={e => {
+                      const selected = Array.from(e.target.selectedOptions, option => option.value).filter(val => val !== "");
+                      setForm({...form, buyCategoryIds: selected})
+                    }} 
+                    style={{...inpStyle, height: "100px"}}
+                  >
+                    <option value="">-- إزالة التحديد --</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
+                  <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.3rem", margin: "0" }}>اضغط مطولاً على Ctrl (أو Cmd) لاختيار أكثر من قسم</p>
                 </div>
 
                 <div>
@@ -186,11 +202,20 @@ export default function AdminGiftOffers() {
                 </div>
 
                 <div>
-                  <label style={lblStyle}>أو السماح للعميل باختيار أي منتج من هذا القسم لمجاناً:</label>
-                  <select value={form.getCategoryId || ""} onChange={e => setForm({...form, getCategoryId: e.target.value, getProductId: ""})} style={inpStyle}>
-                    <option value="">-- اختياري: غير محدد --</option>
+                  <label style={lblStyle}>أو السماح للعميل باختيار أي منتج من هذا القسم مجاناً (يمكن تحديد أكثر من قسم):</label>
+                  <select 
+                    multiple
+                    value={form.getCategoryIds} 
+                    onChange={e => {
+                      const selected = Array.from(e.target.selectedOptions, option => option.value).filter(val => val !== "");
+                      setForm({...form, getCategoryIds: selected, getProductId: ""})
+                    }} 
+                    style={{...inpStyle, height: "100px"}}
+                  >
+                    <option value="">-- إزالة التحديد --</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
+                  <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.3rem", margin: "0" }}>اضغط مطولاً على Ctrl (أو Cmd) لاختيار أكثر من قسم</p>
                 </div>
               </div>
 

@@ -10,29 +10,30 @@ export async function GET(request) {
     const sort = searchParams.get('sort') || 'default';
     const admin = searchParams.get('admin') === 'true'; // إذا كان الطلب من الأدمن لا نطبق الفلاتر
 
-    const where = {};
+    const categoriesParam = searchParams.get('categories');
+    
+    const where = { AND: [] };
     
     if (category && category !== 'all') {
-      where.OR = [{ category }, { categoryId: category }];
+      where.AND.push({ OR: [{ category }, { categoryId: category }] });
+    } else if (categoriesParam) {
+      const categoryList = categoriesParam.split(',');
+      where.AND.push({ OR: [{ category: { in: categoryList } }, { categoryId: { in: categoryList } }] });
     }
 
-    // إذا لم يكن الطلب من الأدمن، أظهر المنتجات النشطة والتي حان موعد نشرها فقط
     if (!admin) {
-      where.isActive = true;
-      where.OR = [
-        { publishAt: null },
-        { publishAt: { lte: new Date() } }
-      ];
-      // في حال كان هناك category سابق في ال OR بسبب الفئة
-      if (category && category !== 'all') {
-         const categoryCond = [{ category }, { categoryId: category }];
-         const publishCond = [{ publishAt: null }, { publishAt: { lte: new Date() } }];
-         where.OR = undefined;
-         where.AND = [
-           { OR: categoryCond },
-           { OR: publishCond }
-         ];
-      }
+      where.AND.push({ isActive: true });
+      where.AND.push({
+        OR: [
+          { publishAt: null },
+          { publishAt: { lte: new Date() } }
+        ]
+      });
+    }
+
+    // If AND is empty, Prisma might not like it, so let's clean it up if needed.
+    if (where.AND.length === 0) {
+      delete where.AND;
     }
 
     const searchQuery = searchParams.get('search');

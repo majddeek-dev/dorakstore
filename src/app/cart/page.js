@@ -13,7 +13,8 @@ export default function CartPage() {
   function openGiftSelector(pg) {
       setActiveGiftOffer(pg);
       setLoadingGifts(true);
-      fetch('/api/products?category=' + pg.offer.getCategoryId)
+      const catIds = pg.offer.getCategories ? pg.offer.getCategories.map(c => c.id).join(',') : '';
+      fetch('/api/products?categories=' + catIds)
          .then(r => r.json())
          .then(data => {
              // Handle if paged or just array

@@ -38,15 +38,13 @@ export default function ProductDetails() {
 
   function handleAddToCart() {
     if (!product) return;
-    for (let i = 0; i < quantity; i++) {
-      addItem({ 
-        id: product.id, 
-        name: product.name, 
-        price: product.price, 
-        imageUrl: product.imageUrl,
-        categoryId: product.categoryId
-      });
-    }
+    addItem({ 
+      id: product.id, 
+      name: product.name, 
+      price: product.price, 
+      imageUrl: product.imageUrl,
+      categoryId: product.categoryId
+    }, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }

@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { productId, minQty, price, label } = body;
 
@@ -24,7 +24,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await prisma.priceRule.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {

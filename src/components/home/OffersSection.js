@@ -2,10 +2,12 @@
 import Link from "next/link";
 import styles from "./OffersSection.module.css";
 import { useState, useEffect } from "react";
+import { useCart } from "@/lib/CartContext";
 
 export default function OffersSection() {
   const [offers, setOffers] = useState({ combos: [], giftOffers: [] });
   const [loading, setLoading] = useState(true);
+  const { addItem } = useCart();
 
   useEffect(() => {
     fetch('/api/public/offers')
@@ -66,9 +68,19 @@ export default function OffersSection() {
                   <div className={styles.newPrice}>{newTotal.toFixed(2)} ₪</div>
                 </div>
 
-                <Link href="/shop" className={styles.ctaBtn}>
-                  تسوّق الآن
-                </Link>
+                <button 
+                  onClick={() => {
+                    combo.items.forEach(item => {
+                      if (item.product) {
+                        addItem(item.product, item.quantity);
+                      }
+                    });
+                    alert("تمت إضافة العرض للسلة بنجاح!");
+                  }} 
+                  className={styles.ctaBtn} 
+                  style={{border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '1rem', width: '100%'}}>
+                  أضف العرض للسلة
+                </button>
               </div>
             );
           })}
@@ -77,7 +89,7 @@ export default function OffersSection() {
             <div key={go.id} className={`${styles.card} ${styles.giftCardOffer}`}>
               <div className={`${styles.badge} ${styles.giftBadge}`}>هدية مجانية 🎁</div>
               <h3 className={styles.comboName}>
-                {go.buyProduct ? `اشترِ ${go.buyProduct.name}` : `قسّم ${go.buyCategory?.name || 'منتجات مختارة'}`}
+                {go.buyProduct ? `اشترِ ${go.buyProduct.name}` : `قسم ${go.buyCategories && go.buyCategories.length > 0 ? go.buyCategories.map(c => c.name).join('، ') : 'منتجات مختارة'}`}
               </h3>
               <p className={styles.comboDesc}>
                 {go.minPrice ? `عند الشراء بقوة ${go.minPrice} ₪ أو أكثر، ` : ""}
@@ -98,7 +110,7 @@ export default function OffersSection() {
                  ) : (
                     <div className={styles.categoryGift}>
                        <span style={{fontSize: "2.5rem"}}>🎁</span>
-                       <p>اختر هديتك بنفسك من قسم {go.getCategory?.name}</p>
+                       <p>اختر هديتك بنفسك من قسم {go.getCategories && go.getCategories.length > 0 ? go.getCategories.map(c => c.name).join('، ') : ''}</p>
                     </div>
                  )}
               </div>

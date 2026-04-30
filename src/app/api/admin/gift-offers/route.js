@@ -8,9 +8,9 @@ export async function GET() {
     const giftOffers = await prisma.giftOffer.findMany({
       include: {
         buyProduct: true,
-        buyCategory: true,
+        buyCategories: true,
         getProduct: true,
-        getCategory: true
+        getCategories: true
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -23,22 +23,22 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { buyProductId, buyCategoryId, minPrice, getProductId, getCategoryId, isActive } = body;
+    const { buyProductId, buyCategoryIds, minPrice, getProductId, getCategoryIds, isActive } = body;
 
     const newOffer = await prisma.giftOffer.create({
       data: {
         buyProductId: buyProductId || null,
-        buyCategoryId: buyCategoryId || null,
+        buyCategories: buyCategoryIds?.length ? { connect: buyCategoryIds.map(id => ({ id })) } : undefined,
         minPrice: minPrice ? parseFloat(minPrice) : null,
         getProductId: getProductId || null,
-        getCategoryId: getCategoryId || null,
+        getCategories: getCategoryIds?.length ? { connect: getCategoryIds.map(id => ({ id })) } : undefined,
         isActive: isActive !== undefined ? isActive : true,
       },
       include: {
         buyProduct: true,
-        buyCategory: true,
+        buyCategories: true,
         getProduct: true,
-        getCategory: true
+        getCategories: true
       }
     });
 

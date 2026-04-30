@@ -18,7 +18,9 @@ export async function GET() {
       where: { isActive: true },
       include: {
         getProduct: true,
-        getCategory: true
+        getCategories: true,
+        buyProduct: true,
+        buyCategories: true
       }
     });
 
