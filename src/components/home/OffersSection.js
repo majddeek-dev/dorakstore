@@ -115,7 +115,15 @@ export default function OffersSection() {
                  )}
               </div>
 
-              <Link href="/shop" className={styles.ctaBtn} style={{background: "#16a34a", marginTop: "auto"}}>
+              <Link 
+                href={
+                  go.buyProduct ? `/product/${go.buyProduct.id}` :
+                  go.buyCategories && go.buyCategories.length > 0 ? `/shop?category=${go.buyCategories[0].id}` :
+                  "/shop"
+                } 
+                className={styles.ctaBtn} 
+                style={{background: "#16a34a", marginTop: "auto"}}
+              >
                 اغتنم العرض
               </Link>
             </div>

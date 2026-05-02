@@ -191,7 +191,7 @@
   background: #f0fdf4;
   border: 1px solid #16a34a;
   padding: 1.25rem;
-  borderRadius: 12px;
+  border-radius: 12px;
   margin-bottom: 2rem;
   display: flex;
   justify-content: space-between;
@@ -254,7 +254,7 @@
   overflow-y: auto;
   position: relative;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .modalHeader {
@@ -270,8 +270,15 @@
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .modalTitle {
@@ -382,13 +389,16 @@
     max-height: 100%;
     border-radius: 0;
   }
+
   .giftGrid {
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 1rem;
   }
+
   .modalTitle {
     font-size: 1.5rem;
   }
+
   .modalIcon {
     font-size: 2.5rem;
   }
