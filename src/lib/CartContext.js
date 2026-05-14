@@ -7,6 +7,8 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const [user, setUser] = useState(null);
   const [memberDiscountPercent, setMemberDiscountPercent] = useState(0);
+  const [enableFreeShipping, setEnableFreeShipping] = useState(false);
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState(500);
   const [offers, setOffers] = useState({ combos: [], priceRules: [], giftOffers: [] });
   const [mounted, setMounted] = useState(false);
   const [offersLoaded, setOffersLoaded] = useState(false);
@@ -29,6 +31,8 @@ export function CartProvider({ children }) {
     ]).then(([userData, settings, offersData]) => {
       if (userData.authenticated) setUser(userData.user);
       if (settings.member_discount_percent) setMemberDiscountPercent(parseFloat(settings.member_discount_percent));
+      if (settings.ENABLE_FREE_SHIPPING) setEnableFreeShipping(settings.ENABLE_FREE_SHIPPING === "true");
+      if (settings.FREE_SHIPPING_THRESHOLD) setFreeShippingThreshold(parseFloat(settings.FREE_SHIPPING_THRESHOLD));
       if (offersData) {
         setOffers(offersData);
         setOffersLoaded(true);
@@ -277,7 +281,8 @@ export function CartProvider({ children }) {
     <CartContext.Provider value={{ 
       items, computedItems: finalItems, addItem, removeItem, updateQty, clearCart, chooseGift,
       subtotal, memberDiscount, memberDiscountPercent, total, count, user, 
-      pendingGifts: pendingGiftsList, offers
+      pendingGifts: pendingGiftsList, offers,
+      enableFreeShipping, freeShippingThreshold
     }}>
       {children}
     </CartContext.Provider>

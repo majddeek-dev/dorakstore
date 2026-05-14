@@ -2,11 +2,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/CartContext";
-import { FREE_SHIPPING_THRESHOLD, ENABLE_FREE_SHIPPING } from "@/lib/config";
 import styles from "./page.module.css";
 
 export default function CheckoutPage() {
-  const { computedItems: items, subtotal, memberDiscount, memberDiscountPercent, total: cartTotal, user, clearCart } = useCart();
+  const { computedItems: items, subtotal, memberDiscount, memberDiscountPercent, total: cartTotal, user, clearCart, enableFreeShipping, freeShippingThreshold } = useCart();
   const router = useRouter();
   const [couponCode, setCouponCode] = useState("");
   const [couponData, setCouponData] = useState(null);
@@ -26,7 +25,7 @@ export default function CheckoutPage() {
   const couponDiscount = couponData ? (subtotal * (couponData.discountPercent / 100)) : 0;
   const totalBeforeShipping = cartTotal - couponDiscount;
   
-  const isFreeShipping = ENABLE_FREE_SHIPPING && totalBeforeShipping >= FREE_SHIPPING_THRESHOLD;
+  const isFreeShipping = enableFreeShipping && totalBeforeShipping >= freeShippingThreshold;
   const shipping = isFreeShipping ? 0 : (SHIPPING_RATES[region] || 0);
 
   const grandTotal = totalBeforeShipping + shipping;

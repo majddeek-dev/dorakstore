@@ -2,11 +2,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/CartContext";
-import { FREE_SHIPPING_THRESHOLD, ENABLE_FREE_SHIPPING } from "@/lib/config";
 import styles from "./page.module.css";
 
 export default function CartPage() {
-  const { items, computedItems, updateQty, removeItem, total, pendingGifts, chooseGift } = useCart();
+  const { items, computedItems, updateQty, removeItem, total, pendingGifts, chooseGift, enableFreeShipping, freeShippingThreshold } = useCart();
   const [activeGiftOffer, setActiveGiftOffer] = useState(null);
   const [giftProducts, setGiftProducts] = useState([]);
   const [loadingGifts, setLoadingGifts] = useState(false);
@@ -116,10 +115,10 @@ export default function CartPage() {
               <span>المجموع الفرعي</span>
               <span>{total.toFixed(2)} ₪</span>
             </div>
-            {ENABLE_FREE_SHIPPING && (
-              total < FREE_SHIPPING_THRESHOLD ? (
+            {enableFreeShipping && (
+              total < freeShippingThreshold ? (
                 <div style={{ color: "#d97706", fontSize: "0.9rem", marginTop: "8px", marginBottom: "8px", textAlign: "center", background: "#fef3c7", padding: "8px", borderRadius: "8px" }}>
-                  🚚 أضف منتجات بقيمة {(FREE_SHIPPING_THRESHOLD - total).toFixed(2)} ₪ للحصول على <strong>شحن مجاني!</strong>
+                  🚚 أضف منتجات بقيمة {(freeShippingThreshold - total).toFixed(2)} ₪ للحصول على <strong>شحن مجاني!</strong>
                 </div>
               ) : (
                 <div style={{ color: "#059669", fontSize: "0.9rem", marginTop: "8px", marginBottom: "8px", textAlign: "center", background: "#d1fae5", padding: "8px", borderRadius: "8px" }}>
@@ -129,8 +128,8 @@ export default function CartPage() {
             )}
             <div className={styles.summaryRow}>
               <span>الشحن</span>
-              <span style={{ color: ENABLE_FREE_SHIPPING && total >= FREE_SHIPPING_THRESHOLD ? "#059669" : "inherit" }}>
-                {ENABLE_FREE_SHIPPING && total >= FREE_SHIPPING_THRESHOLD ? "مجاني" : "يحسب في الدفع"}
+              <span style={{ color: enableFreeShipping && total >= freeShippingThreshold ? "#059669" : "inherit" }}>
+                {enableFreeShipping && total >= freeShippingThreshold ? "مجاني" : "يحسب في الدفع"}
               </span>
             </div>
             <div className={`${styles.summaryRow} ${styles.totalRow}`}>

@@ -47,6 +47,8 @@ export default function AdminLayout({ children }) {
           <Link href="/admin/price-rules" className={pathname.startsWith('/admin/price-rules') ? styles.active : ''}>خصم الكميات</Link>
           <div style={{ borderBottom: "1px solid #e5e7eb", margin: "0.5rem 1rem" }}></div>
           <Link href="/admin/accounting" className={pathname.startsWith('/admin/accounting') ? styles.active : ''}>حسابات</Link>
+          <div style={{ borderBottom: "1px solid #e5e7eb", margin: "0.5rem 1rem" }}></div>
+          <Link href="/admin/settings" className={pathname.startsWith('/admin/settings') ? styles.active : ''}>الإعدادات</Link>
           <Link href="/" className={`${styles.storeLink} ${pathname === '/' ? styles.active : ''}`}>العودة للمتجر</Link>
         </nav>
         <button
