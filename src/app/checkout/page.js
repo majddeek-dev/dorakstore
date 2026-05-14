@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/CartContext";
+import { FREE_SHIPPING_THRESHOLD, ENABLE_FREE_SHIPPING } from "@/lib/config";
 import styles from "./page.module.css";
 
 export default function CheckoutPage() {
@@ -21,11 +22,14 @@ export default function CheckoutPage() {
     "قطاع غزة": 30,
   };
 
-  const shipping = SHIPPING_RATES[region] || 0;
-
   // Coupon calculation
   const couponDiscount = couponData ? (subtotal * (couponData.discountPercent / 100)) : 0;
-  const grandTotal = cartTotal - couponDiscount + shipping;
+  const totalBeforeShipping = cartTotal - couponDiscount;
+  
+  const isFreeShipping = ENABLE_FREE_SHIPPING && totalBeforeShipping >= FREE_SHIPPING_THRESHOLD;
+  const shipping = isFreeShipping ? 0 : (SHIPPING_RATES[region] || 0);
+
+  const grandTotal = totalBeforeShipping + shipping;
 
   async function handleApplyCoupon(e) {
     e.preventDefault();
@@ -173,8 +177,17 @@ export default function CheckoutPage() {
 
             <div className={styles.row}>
               <span>مصاريف الشحن</span>
-              <span style={{ color: shipping === 0 ? "#888" : "inherit" }}>
-                {shipping > 0 ? `${shipping.toFixed(2)} ₪` : "يرجى اختيار المنطقة"}
+              <span style={{ color: isFreeShipping ? "#059669" : (shipping === 0 ? "#888" : "inherit") }}>
+                {isFreeShipping ? (
+                  <>
+                    <span style={{ textDecoration: "line-through", color: "#888", marginRight: "8px", fontSize: "0.9em" }}>
+                      {SHIPPING_RATES[region] ? `${SHIPPING_RATES[region]} ₪` : ""}
+                    </span>
+                    مجاني
+                  </>
+                ) : (
+                  shipping > 0 ? `${shipping.toFixed(2)} ₪` : "يرجى اختيار المنطقة"
+                )}
               </span>
             </div>
             <div className={`${styles.row} ${styles.totalRow}`}>

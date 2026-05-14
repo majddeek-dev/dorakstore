@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/CartContext";
+import { FREE_SHIPPING_THRESHOLD, ENABLE_FREE_SHIPPING } from "@/lib/config";
 import styles from "./page.module.css";
 
 export default function CartPage() {
@@ -13,6 +14,13 @@ export default function CartPage() {
   function openGiftSelector(pg) {
       setActiveGiftOffer(pg);
       setLoadingGifts(true);
+      
+      if (pg.offer.getProducts && pg.offer.getProducts.length > 0) {
+          setGiftProducts(pg.offer.getProducts);
+          setLoadingGifts(false);
+          return;
+      }
+
       const catIds = pg.offer.getCategories ? pg.offer.getCategories.map(c => c.id).join(',') : '';
       fetch('/api/products?categories=' + catIds)
          .then(r => r.json())
@@ -108,9 +116,22 @@ export default function CartPage() {
               <span>المجموع الفرعي</span>
               <span>{total.toFixed(2)} ₪</span>
             </div>
+            {ENABLE_FREE_SHIPPING && (
+              total < FREE_SHIPPING_THRESHOLD ? (
+                <div style={{ color: "#d97706", fontSize: "0.9rem", marginTop: "8px", marginBottom: "8px", textAlign: "center", background: "#fef3c7", padding: "8px", borderRadius: "8px" }}>
+                  🚚 أضف منتجات بقيمة {(FREE_SHIPPING_THRESHOLD - total).toFixed(2)} ₪ للحصول على <strong>شحن مجاني!</strong>
+                </div>
+              ) : (
+                <div style={{ color: "#059669", fontSize: "0.9rem", marginTop: "8px", marginBottom: "8px", textAlign: "center", background: "#d1fae5", padding: "8px", borderRadius: "8px" }}>
+                  🎉 مبروك! لقد حصلت على <strong>شحن مجاني</strong>
+                </div>
+              )
+            )}
             <div className={styles.summaryRow}>
               <span>الشحن</span>
-              <span>يحسب في الدفع</span>
+              <span style={{ color: ENABLE_FREE_SHIPPING && total >= FREE_SHIPPING_THRESHOLD ? "#059669" : "inherit" }}>
+                {ENABLE_FREE_SHIPPING && total >= FREE_SHIPPING_THRESHOLD ? "مجاني" : "يحسب في الدفع"}
+              </span>
             </div>
             <div className={`${styles.summaryRow} ${styles.totalRow}`}>
               <span>الإجمالي</span>
@@ -136,7 +157,7 @@ export default function CartPage() {
                  <span className={styles.modalIcon}>🎁</span>
                  <h2 className={styles.modalTitle}>مبروك، اختر هديتك!</h2>
                  <p className={styles.modalDesc}>
-                   يحق لك اختيار <strong>{activeGiftOffer.qtyRemaining}</strong> منتجات مجانية من هذا القسم.
+                   يحق لك اختيار <strong>{activeGiftOffer.qtyRemaining}</strong> منتجات مجانية من هذه القائمة.
                  </p>
               </div>
               
@@ -157,7 +178,7 @@ export default function CartPage() {
                        </div>
                     ))}
                     {giftProducts.length === 0 && (
-                      <p style={{gridColumn:"1/-1", textAlign:"center", padding:"3rem", color: "#999"}}>لا توجد منتجات متاحة حالياً في هذا القسم.</p>
+                      <p style={{gridColumn:"1/-1", textAlign:"center", padding:"3rem", color: "#999"}}>لا توجد منتجات متاحة حالياً في هذه القائمة.</p>
                     )}
                  </div>
               )}

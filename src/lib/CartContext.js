@@ -233,7 +233,7 @@ export function CartProvider({ children }) {
            } else {
              existingGift.qty = totalQty; // sync qty
            }
-        } else if (go.getCategories && go.getCategories.length > 0) {
+        } else if ((go.getCategories && go.getCategories.length > 0) || (go.getProducts && go.getProducts.length > 0)) {
            const chosenGiftsForOffer = finalItems.filter(i => i.isGift && i.giftOfferId === go.id);
            const chosenQty = chosenGiftsForOffer.reduce((sum, item) => sum + item.qty, 0);
 

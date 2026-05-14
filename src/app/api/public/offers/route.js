@@ -18,6 +18,7 @@ export async function GET() {
       where: { isActive: true },
       include: {
         getProduct: true,
+        getProducts: true,
         getCategories: true,
         buyProduct: true,
         buyCategories: true

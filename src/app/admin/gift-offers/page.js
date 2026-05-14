@@ -10,7 +10,7 @@ export default function AdminGiftOffers() {
   
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
-    buyProductId: "", buyCategoryIds: [], minPrice: "", getProductId: "", getCategoryIds: [], isActive: true
+    buyProductId: "", buyCategoryIds: [], minPrice: "", getProductId: "", getProductIds: [], getCategoryIds: [], isActive: true
   });
 
   useEffect(() => { loadData(); }, []);
@@ -43,6 +43,7 @@ export default function AdminGiftOffers() {
       buyCategoryIds: [], 
       minPrice: "",
       getProductId: "", 
+      getProductIds: [],
       getCategoryIds: [],
       isActive: true 
     });
@@ -115,6 +116,7 @@ export default function AdminGiftOffers() {
                   </td>
                   <td style={{ padding: "0.9rem 1.2rem", color: "#059669", fontWeight: 700 }}>
                     {o.getProduct ? `🎁 ${o.getProduct.name}` : ""}
+                    {o.getProducts && o.getProducts.length > 0 ? `🎁 اختيار العميل من (${o.getProducts.map(p => p.name).join('، ')})` : ""}
                     {o.getCategories && o.getCategories.length > 0 ? `🎁 اختيار العميل من قسم (${o.getCategories.map(c => c.name).join('، ')})` : ""}
                   </td>
                   <td style={{ padding: "0.9rem 1.2rem" }}>
@@ -132,6 +134,7 @@ export default function AdminGiftOffers() {
                         setForm({
                           ...o,
                           buyCategoryIds: o.buyCategories ? o.buyCategories.map(c => c.id) : [],
+                          getProductIds: o.getProducts ? o.getProducts.map(p => p.id) : [],
                           getCategoryIds: o.getCategories ? o.getCategories.map(c => c.id) : []
                         }); 
                         setModal(true); 
@@ -195,20 +198,37 @@ export default function AdminGiftOffers() {
                 <p style={{ margin: "0 0 1rem 0", fontWeight: 700, fontSize: "0.95rem", color: "#166534" }}>الهدية التي سيحصل عليها العميل (اختر إحداها فقط):</p>
                 <div style={{ marginBottom: "1rem" }}>
                   <label style={lblStyle}>إعطاء منتج محدد بشكل مباشر:</label>
-                  <select value={form.getProductId || ""} onChange={e => setForm({...form, getProductId: e.target.value, getCategoryId: ""})} style={inpStyle}>
+                  <select value={form.getProductId || ""} onChange={e => setForm({...form, getProductId: e.target.value, getProductIds: [], getCategoryIds: []})} style={inpStyle}>
                     <option value="">-- اختياري: غير محدد --</option>
                     {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
+                </div>
+
+                <div style={{ marginBottom: "1rem" }}>
+                  <label style={lblStyle}>أو السماح للعميل باختيار أي منتج من قائمة محددة (تحديد أكثر من منتج):</label>
+                  <select 
+                    multiple
+                    value={form.getProductIds || []} 
+                    onChange={e => {
+                      const selected = Array.from(e.target.selectedOptions, option => option.value).filter(val => val !== "");
+                      setForm({...form, getProductIds: selected, getProductId: "", getCategoryIds: []})
+                    }} 
+                    style={{...inpStyle, height: "100px"}}
+                  >
+                    <option value="">-- إزالة التحديد --</option>
+                    {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                  <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.3rem", margin: "0" }}>اضغط مطولاً على Ctrl (أو Cmd) لاختيار أكثر من منتج</p>
                 </div>
 
                 <div>
                   <label style={lblStyle}>أو السماح للعميل باختيار أي منتج من هذا القسم مجاناً (يمكن تحديد أكثر من قسم):</label>
                   <select 
                     multiple
-                    value={form.getCategoryIds} 
+                    value={form.getCategoryIds || []} 
                     onChange={e => {
                       const selected = Array.from(e.target.selectedOptions, option => option.value).filter(val => val !== "");
-                      setForm({...form, getCategoryIds: selected, getProductId: ""})
+                      setForm({...form, getCategoryIds: selected, getProductId: "", getProductIds: []})
                     }} 
                     style={{...inpStyle, height: "100px"}}
                   >

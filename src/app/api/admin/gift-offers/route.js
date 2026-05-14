@@ -10,6 +10,7 @@ export async function GET() {
         buyProduct: true,
         buyCategories: true,
         getProduct: true,
+        getProducts: true,
         getCategories: true
       },
       orderBy: { createdAt: 'desc' },
@@ -23,7 +24,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { buyProductId, buyCategoryIds, minPrice, getProductId, getCategoryIds, isActive } = body;
+    const { buyProductId, buyCategoryIds, minPrice, getProductId, getProductIds, getCategoryIds, isActive } = body;
 
     const newOffer = await prisma.giftOffer.create({
       data: {
@@ -31,6 +32,7 @@ export async function POST(request) {
         buyCategories: buyCategoryIds?.length ? { connect: buyCategoryIds.map(id => ({ id })) } : undefined,
         minPrice: minPrice ? parseFloat(minPrice) : null,
         getProductId: getProductId || null,
+        getProducts: getProductIds?.length ? { connect: getProductIds.map(id => ({ id })) } : undefined,
         getCategories: getCategoryIds?.length ? { connect: getCategoryIds.map(id => ({ id })) } : undefined,
         isActive: isActive !== undefined ? isActive : true,
       },
@@ -38,6 +40,7 @@ export async function POST(request) {
         buyProduct: true,
         buyCategories: true,
         getProduct: true,
+        getProducts: true,
         getCategories: true
       }
     });

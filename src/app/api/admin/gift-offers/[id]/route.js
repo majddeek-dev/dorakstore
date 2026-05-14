@@ -6,7 +6,7 @@ export async function PUT(request, props) {
     const params = await props.params;
     const { id } = params;
     const body = await request.json();
-    const { buyProductId, buyCategoryIds, minPrice, getProductId, getCategoryIds, isActive } = body;
+    const { buyProductId, buyCategoryIds, minPrice, getProductId, getProductIds, getCategoryIds, isActive } = body;
 
     const offer = await prisma.giftOffer.update({
       where: { id },
@@ -15,6 +15,7 @@ export async function PUT(request, props) {
         buyCategories: { set: buyCategoryIds?.length ? buyCategoryIds.map(id => ({ id })) : [] },
         minPrice: minPrice ? parseFloat(minPrice) : null, 
         getProductId: getProductId || null, 
+        getProducts: { set: getProductIds?.length ? getProductIds.map(id => ({ id })) : [] },
         getCategories: { set: getCategoryIds?.length ? getCategoryIds.map(id => ({ id })) : [] },
         isActive 
       },

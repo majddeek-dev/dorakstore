@@ -32,6 +32,7 @@ model Product {
   priceRules  PriceRule[]
   buyGiftOffers GiftOffer[] @relation("BuyProduct")
   getGiftOffers GiftOffer[] @relation("GetProduct")
+  getGiftOffersMultiple GiftOffer[] @relation("GetProductsGifts")
 }
 
 model Order {
@@ -164,6 +165,7 @@ model GiftOffer {
   
   getProductId    String?
   getProduct      Product?  @relation("GetProduct", fields: [getProductId], references: [id], onDelete: Cascade)
+  getProducts     Product[] @relation("GetProductsGifts")
   getCategories   Category[] @relation("GetCategoryGifts")
   
   isActive        Boolean   @default(true)
