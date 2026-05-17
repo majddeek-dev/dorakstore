@@ -3,9 +3,13 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dk7-store-super-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(request) {
+  if (!JWT_SECRET) {
+    return NextResponse.json({ error: 'خطأ في إعداد الخادم' }, { status: 500 });
+  }
+
   try {
     const { email, password } = await request.json();
 
@@ -14,13 +18,16 @@ export async function POST(request) {
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return NextResponse.json({ error: 'هذا الحساب غير موجود' }, { status: 401 });
-    }
 
-    const isValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isValid) {
-      return NextResponse.json({ error: 'كلمة المرور غير صحيحة' }, { status: 401 });
+    // Constant-time check: always run bcrypt even if user not found to prevent timing attacks
+    const dummyHash = '$2a$12$invalidhashfortimingprotection00000000000000000000000';
+    const isValid = user
+      ? await bcrypt.compare(password, user.passwordHash)
+      : await bcrypt.compare(password, dummyHash).then(() => false);
+
+    if (!user || !isValid) {
+      // Unified message — does NOT reveal whether email exists
+      return NextResponse.json({ error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' }, { status: 401 });
     }
 
     const secret = new TextEncoder().encode(JWT_SECRET);
@@ -41,6 +48,8 @@ export async function POST(request) {
 
     return response;
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Login error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }
+

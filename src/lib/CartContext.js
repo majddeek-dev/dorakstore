@@ -217,8 +217,8 @@ export function CartProvider({ children }) {
       });
 
       if (matchingItems.length > 0) {
-        // Add the gift item
-        const totalQty = matchingItems.reduce((sum, item) => sum + item.qty, 0);
+        // Add the gift item (only 1 per order)
+        const totalQty = 1;
         
         if (go.getProductId && go.getProduct) {
            const existingGift = finalItems.find(i => i.id === go.getProductId && i.isGift && i.giftOfferId === go.id);

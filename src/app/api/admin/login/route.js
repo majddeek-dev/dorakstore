@@ -3,9 +3,14 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dk7-store-super-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(request) {
+  if (!JWT_SECRET) {
+    console.error('SECURITY: JWT_SECRET is not configured!');
+    return NextResponse.json({ error: 'خطأ في إعداد الخادم' }, { status: 500 });
+  }
+
   try {
     const { username, password } = await request.json();
 
@@ -15,13 +20,13 @@ export async function POST(request) {
 
     const admin = await prisma.admin.findUnique({ where: { username } });
 
-    if (!admin) {
-      return NextResponse.json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' }, { status: 401 });
-    }
+    // Use constant-time check even when user not found to prevent timing attacks
+    const dummyHash = '$2a$12$invalidhashfortimingprotection00000000000000000000000';
+    const isValid = admin
+      ? await bcrypt.compare(password, admin.passwordHash)
+      : await bcrypt.compare(password, dummyHash).then(() => false);
 
-    const isValid = await bcrypt.compare(password, admin.passwordHash);
-
-    if (!isValid) {
+    if (!admin || !isValid) {
       return NextResponse.json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' }, { status: 401 });
     }
 
@@ -43,11 +48,8 @@ export async function POST(request) {
 
     return response;
   } catch (error) {
-    console.error('Login error:', error);
-    return NextResponse.json({ 
-      error: 'حدث خطأ في الخادم', 
-      details: error.message,
-      code: error.code 
-    }, { status: 500 });
+    console.error('Admin login error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }
+

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/adminAuth';
 
 export async function GET(request) {
   try {
@@ -8,7 +9,6 @@ export async function GET(request) {
     const page = searchParams.get('page');
     const limit = searchParams.get('limit') || 20;
     const sort = searchParams.get('sort') || 'default';
-    const admin = searchParams.get('admin') === 'true'; // إذا كان الطلب من الأدمن لا نطبق الفلاتر
 
     const categoriesParam = searchParams.get('categories');
     
@@ -21,15 +21,14 @@ export async function GET(request) {
       where.AND.push({ OR: [{ category: { in: categoryList } }, { categoryId: { in: categoryList } }] });
     }
 
-    if (!admin) {
-      where.AND.push({ isActive: true });
-      where.AND.push({
-        OR: [
-          { publishAt: null },
-          { publishAt: { lte: new Date() } }
-        ]
-      });
-    }
+    // Always filter to active & published products for public requests
+    where.AND.push({ isActive: true });
+    where.AND.push({
+      OR: [
+        { publishAt: null },
+        { publishAt: { lte: new Date() } }
+      ]
+    });
 
     // If AND is empty, Prisma might not like it, so let's clean it up if needed.
     if (where.AND.length === 0) {
@@ -89,6 +88,9 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const auth = await requireAdmin(request);
+  if (auth.ok !== true) return auth;
+
   try {
     const data = await request.json();
     const productData = {

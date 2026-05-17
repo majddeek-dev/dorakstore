@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/adminAuth';
 
 export async function GET(request, { params }) {
   try {
@@ -16,6 +17,9 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
+  const auth = await requireAdmin(request);
+  if (auth.ok !== true) return auth;
+
   try {
     const { id } = await params;
     const data = await request.json();
@@ -50,6 +54,9 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
+  const auth = await requireAdmin(request);
+  if (auth.ok !== true) return auth;
+
   try {
     const { id } = await params;
     // Delete order items that reference this product first

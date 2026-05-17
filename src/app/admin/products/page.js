@@ -114,7 +114,7 @@ export default function AdminProducts() {
     setLoading(true);
     try {
       const [pRes, cRes] = await Promise.all([
-        fetch("/api/products?admin=true"), // fetch all even inactive
+        fetch("/api/admin/products"), // dedicated admin-only endpoint
         fetch("/api/admin/categories")
       ]);
       const [pData, cData] = await Promise.all([pRes.json(), cRes.json()]);

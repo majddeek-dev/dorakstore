@@ -53,7 +53,12 @@ export default function CartPage() {
               <div className={styles.giftAlert}>
                 <div className={styles.giftAlertTitle}>
                    <span className={styles.giftAlertEmoji}>🎁</span>
-                   <span>مبروك! لك {pendingGifts.reduce((s, pg) => s + pg.qtyRemaining, 0)} هدايا مجانية بانتظار اختيارك.</span>
+                   {(() => {
+                     const qty = pendingGifts.reduce((s, pg) => s + pg.qtyRemaining, 0);
+                     return qty === 1 
+                       ? <span>مبروك! لك هدية مجانية واحدة بانتظار اختيارك.</span>
+                       : <span>مبروك! لك {qty} هدايا مجانية بانتظار اختيارك.</span>;
+                   })()}
                 </div>
                 <button onClick={() => openGiftSelector(pendingGifts[0])} className={styles.giftAlertBtn}>
                    اختيار الهدية الآن
@@ -156,7 +161,9 @@ export default function CartPage() {
                  <span className={styles.modalIcon}>🎁</span>
                  <h2 className={styles.modalTitle}>مبروك، اختر هديتك!</h2>
                  <p className={styles.modalDesc}>
-                   يحق لك اختيار <strong>{activeGiftOffer.qtyRemaining}</strong> منتجات مجانية من هذه القائمة.
+                   {activeGiftOffer.qtyRemaining === 1 
+                     ? <>يحق لك اختيار <strong>منتج مجاني واحد</strong> من هذه القائمة.</>
+                     : <>يحق لك اختيار <strong>{activeGiftOffer.qtyRemaining}</strong> منتجات مجانية من هذه القائمة.</>}
                  </p>
               </div>
               

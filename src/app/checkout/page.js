@@ -67,8 +67,8 @@ export default function CheckoutPage() {
       customerPhone: formData.get("phone"),
       region: formData.get("region"),
       address: formData.get("address"),
-      total: grandTotal,
-      items: items.map(i => ({ id: i.realProductId || i.id, qty: i.qty, price: i.effectivePrice !== undefined ? i.effectivePrice : i.price })),
+      couponCode: couponData?.code || null,
+      items: items.map(i => ({ id: i.realProductId || i.id, qty: i.qty, isGift: i.isGift || false })),
     };
 
     try {
