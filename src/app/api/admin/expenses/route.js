@@ -8,7 +8,8 @@ export async function GET() {
     });
     return NextResponse.json(expenses);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Expenses API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }
 
@@ -32,6 +33,7 @@ export async function POST(request) {
 
     return NextResponse.json(expense, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Expenses API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

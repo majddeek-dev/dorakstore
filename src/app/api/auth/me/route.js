@@ -2,9 +2,14 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dk7-store-super-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function GET(request) {
+  if (!JWT_SECRET) {
+    console.error('SECURITY: JWT_SECRET is not set in environment variables!');
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
+  }
+
   try {
     const token = request.cookies.get('user_token')?.value;
     if (!token) {

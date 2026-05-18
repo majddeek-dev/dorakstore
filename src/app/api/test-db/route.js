@@ -2,8 +2,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function GET() {
+  // Block in production — this endpoint is for development only
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   try {
-    // Try a simple query
     const result = await prisma.$queryRaw`SELECT 1 as test`;
     return NextResponse.json({ success: true, message: 'Database connection is successful!', result });
   } catch (error) {
@@ -12,8 +16,6 @@ export async function GET() {
       success: false, 
       message: 'Database connection failed.', 
       error: error.message,
-      code: error.code,
-      env_db_url: process.env.DATABASE_URL ? 'PRESENT' : 'MISSING'
     }, { status: 500 });
   }
 }

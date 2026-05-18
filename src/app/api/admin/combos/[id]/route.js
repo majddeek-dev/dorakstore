@@ -38,7 +38,8 @@ export async function PUT(request, { params }) {
 
     return NextResponse.json(updatedCombo);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Combo API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }
 
@@ -49,6 +50,7 @@ export async function DELETE(request, { params }) {
     await prisma.combo.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Combo API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

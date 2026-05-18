@@ -18,7 +18,8 @@ export async function PUT(request, { params }) {
     });
     return NextResponse.json(rule);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Price Rules API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }
 
@@ -28,6 +29,7 @@ export async function DELETE(request, { params }) {
     await prisma.priceRule.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Price Rules API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

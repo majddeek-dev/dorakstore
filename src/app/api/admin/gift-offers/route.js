@@ -17,7 +17,8 @@ export async function GET() {
     });
     return NextResponse.json(giftOffers);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Gift Offers API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }
 
@@ -47,6 +48,7 @@ export async function POST(request) {
 
     return NextResponse.json(newOffer, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Gift Offers API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

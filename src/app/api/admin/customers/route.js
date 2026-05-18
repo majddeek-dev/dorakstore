@@ -64,6 +64,7 @@ export async function GET() {
 
     return NextResponse.json(combinedCustomers);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Customers API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

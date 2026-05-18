@@ -97,12 +97,12 @@ export async function POST(request) {
     let couponDiscountAmount = 0;
     if (couponCode) {
       const coupon = await prisma.coupon.findUnique({ where: { code: couponCode.toUpperCase() } });
-      if (coupon) {
+      if (coupon && coupon.isActive) {
         couponDiscountAmount = subtotal * (coupon.discountPercent / 100);
       }
     }
 
-    const afterDiscounts = subtotal - memberDiscountAmount - couponDiscountAmount;
+    const afterDiscounts = Math.max(0, subtotal - memberDiscountAmount - couponDiscountAmount);
 
     // Shipping
     const freeShippingSetting = await prisma.globalSetting.findUnique({ where: { key: 'ENABLE_FREE_SHIPPING' } });
@@ -112,7 +112,7 @@ export async function POST(request) {
     const isFreeShipping = freeShippingEnabled && afterDiscounts >= threshold;
     const shipping = isFreeShipping ? 0 : (SHIPPING_RATES[region] || 0);
 
-    const total = afterDiscounts + shipping;
+    const total = Math.max(0, afterDiscounts + shipping);
 
     if (validatedItems.length === 0) {
       return NextResponse.json({ error: 'لا توجد منتجات صالحة في الطلب' }, { status: 400 });

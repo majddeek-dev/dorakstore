@@ -8,6 +8,7 @@ export async function GET() {
     });
     return NextResponse.json(categories);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Categories API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

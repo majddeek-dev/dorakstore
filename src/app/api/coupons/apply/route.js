@@ -21,6 +21,7 @@ export async function POST(request) {
       discountPercent: coupon.discountPercent
     });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Coupon apply error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

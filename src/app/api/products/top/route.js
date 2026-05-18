@@ -47,6 +47,7 @@ export async function GET() {
     return NextResponse.json(products);
   } catch (error) {
     console.error("Top products error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Top products API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

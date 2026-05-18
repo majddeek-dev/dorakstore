@@ -8,7 +8,8 @@ export async function GET() {
     });
     return NextResponse.json(coupons);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Coupons GET error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }
 
@@ -16,14 +17,18 @@ export async function POST(request) {
   try {
     const { code, discountPercent } = await request.json();
 
-    if (!code || isNaN(discountPercent)) {
+    const pct = parseFloat(discountPercent);
+    if (!code || isNaN(pct)) {
       return NextResponse.json({ error: 'Code and valid discount percentage are required' }, { status: 400 });
+    }
+    if (pct < 0 || pct > 100) {
+      return NextResponse.json({ error: 'نسبة الخصم يجب أن تكون بين 0 و 100' }, { status: 400 });
     }
 
     const coupon = await prisma.coupon.create({
       data: {
         code: code.toUpperCase(),
-        discountPercent: parseFloat(discountPercent)
+        discountPercent: pct
       }
     });
 
@@ -41,6 +46,7 @@ export async function DELETE(request) {
     await prisma.coupon.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Coupon DELETE error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

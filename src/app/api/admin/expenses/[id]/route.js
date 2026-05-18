@@ -7,6 +7,7 @@ export async function DELETE(request, { params }) {
     await prisma.expense.delete({ where: { id } });
     return NextResponse.json({ message: 'Expense deleted successfully' });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Expenses API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

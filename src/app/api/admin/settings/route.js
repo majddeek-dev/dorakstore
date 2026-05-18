@@ -7,7 +7,8 @@ export async function GET() {
     const settingsMap = settings.reduce((acc, s) => ({ ...acc, [s.key]: s.value }), {});
     return NextResponse.json(settingsMap);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Settings API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }
 
@@ -26,6 +27,7 @@ export async function POST(request) {
 
     return NextResponse.json(setting);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Settings API error:', error);
+    return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }
