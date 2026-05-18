@@ -6,6 +6,8 @@ export default function AdminSettings() {
     ENABLE_FREE_SHIPPING: "false",
     FREE_SHIPPING_THRESHOLD: "500",
     member_discount_percent: "0",
+    ANNOUNCEMENT_BAR_ENABLED: "false",
+    ANNOUNCEMENT_BAR_TEXT: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -82,6 +84,38 @@ export default function AdminSettings() {
                   onChange={handleChange} 
                   style={{ width: "100%", padding: "0.75rem", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "0.95rem" }} 
                   required
+                />
+              </div>
+            )}
+          </div>
+
+          <div style={{ padding: "1.5rem", background: "#f9fafb", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
+            <h3 style={{ margin: "0 0 1rem 0", color: "#111", fontSize: "1.1rem" }}>📢 شريط الإعلانات (أعلى الموقع)</h3>
+            
+            <div style={{ marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <input 
+                type="checkbox" 
+                id="ANNOUNCEMENT_BAR_ENABLED" 
+                name="ANNOUNCEMENT_BAR_ENABLED"
+                checked={settings.ANNOUNCEMENT_BAR_ENABLED === "true"}
+                onChange={handleChange}
+                style={{ width: "18px", height: "18px" }}
+              />
+              <label htmlFor="ANNOUNCEMENT_BAR_ENABLED" style={{ fontWeight: 600, cursor: "pointer" }}>إظهار شريط الإعلانات</label>
+            </div>
+
+            {settings.ANNOUNCEMENT_BAR_ENABLED === "true" && (
+              <div>
+                <label style={{ display: "block", fontWeight: 600, marginBottom: "0.4rem", fontSize: "0.9rem", color: "#555" }}>
+                  نص الإعلان
+                </label>
+                <input 
+                  type="text" 
+                  name="ANNOUNCEMENT_BAR_TEXT"
+                  value={settings.ANNOUNCEMENT_BAR_TEXT || ""} 
+                  onChange={handleChange} 
+                  placeholder="مثال: توصيل مجاني للطلبات فوق 200 شيكل!"
+                  style={{ width: "100%", padding: "0.75rem", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "0.95rem" }} 
                 />
               </div>
             )}

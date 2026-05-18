@@ -2,6 +2,7 @@ import "./globals.css";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import { CartProvider } from "@/lib/CartContext";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <CartProvider>
+          <AnnouncementBar />
           <Header />
           <main style={{ minHeight: "calc(100vh - 80px - 250px)" }}>
             {children}
