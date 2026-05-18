@@ -37,6 +37,7 @@ export async function GET() {
       totalCustomers: uniqueCustomers.length,
       totalCombos
     });
+  } catch (error) {
     console.error('Stats API error:', error);
     return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }
