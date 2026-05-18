@@ -20,8 +20,8 @@ export default function AnnouncementBar() {
 
   return (
     <div style={{
-      background: "linear-gradient(90deg, #615200ff, #d4af37)",
-      color: "#fff",
+      background: "linear-gradient(90deg, #000000ff, #615200ff)",
+      color: "#ffffffff",
       textAlign: "center",
       padding: "10px 16px",
       fontSize: "0.95rem",
