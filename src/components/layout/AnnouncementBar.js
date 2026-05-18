@@ -19,11 +19,11 @@ export default function AnnouncementBar() {
   if (!settings.enabled || !settings.text) return null;
 
   return (
-    <div style={{ 
-      background: "linear-gradient(90deg, #000, #222)", 
-      color: "#fff", 
-      textAlign: "center", 
-      padding: "10px 16px", 
+    <div style={{
+      background: "linear-gradient(90deg, #615200ff, #d4af37)",
+      color: "#fff",
+      textAlign: "center",
+      padding: "10px 16px",
       fontSize: "0.95rem",
       fontWeight: "600",
       letterSpacing: "0.5px",
