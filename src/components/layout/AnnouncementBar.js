@@ -22,15 +22,18 @@ export default function AnnouncementBar() {
     <div style={{
       background: "linear-gradient(90deg, #000000ff, #615200ff)",
       color: "#ffffffff",
-      textAlign: "center",
-      padding: "10px 16px",
+      padding: "10px 0",
       fontSize: "0.95rem",
       fontWeight: "600",
       letterSpacing: "0.5px",
       zIndex: 100,
-      position: "relative"
+      position: "relative",
+      overflow: "hidden",
+      whiteSpace: "nowrap"
     }}>
-      {settings.text}
+      <div className="animate-marquee-rtl">
+        {settings.text}
+      </div>
     </div>
   );
 }

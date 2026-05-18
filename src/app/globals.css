@@ -39,3 +39,19 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+@keyframes marquee-rtl {
+  0% {
+    transform: translateX(-100vw);
+  }
+  100% {
+    transform: translateX(100vw);
+  }
+}
+
+.animate-marquee-rtl {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee-rtl 20s linear infinite;
+}
+
